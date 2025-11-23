@@ -53,11 +53,11 @@ export default function AddPatientPage() {
       
       // Mock data for testing
       setPatientData({
-        fullName: 'John Doe',
-        dateOfBirth: '1980-05-15',
-        gender: 'male',
+        fullName: 'chaima traia ',
+        dateOfBirth: '2005-11=29',
+        gender: 'female',
         patientId: id,
-        phoneNumber: '+1 (555) 123-4567',
+        phoneNumber: '06 6666 6668',
         pathology: 'Test pathology',
         familyHistory: '',
         allergies: 'Penicillin',
