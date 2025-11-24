@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, Calendar, FileText, Settings, X } from 'lucide-react';
+import { Home, Users, Calendar, FileText, Settings, X, ClipboardListIcon } from 'lucide-react';
+
+
+
+
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,10 +15,11 @@ export default function Sidebar() {
 
   const menuItems = [
     { icon: Home, label: 'Tableau de bord', href: '/website/dashboard' },
-    { icon: Users, label: 'Patients', href: '/patients' },
+    { icon: Users, label: 'Patients', href: 'patients' },
     { icon: Calendar, label: 'Rendez-vous', href: '/website/appointments' },
     { icon: FileText, label: 'Rapports', href: '/website/reports' },
     { icon: Settings, label: 'Paramètres', href: '/website/settings' },
+    { icon: ClipboardListIcon, label: 'Ordonnances', href: '/website/prescriptions' },
   ];
 
   return (
