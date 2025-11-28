@@ -1,15 +1,15 @@
-'use client'; 
-// This tells Next.js that this page should run in the browser.
+'use client';
+// Page for adding or editing a patient
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-// These are layout components (just UI)
+
 import Sidebar from '@/SharedComponents/Sidebar';
 import Navbar from '@/SharedComponents/Navbar';
 import Footer from '@/SharedComponents/Footer';
 
-// The patient form component where the user fills the data
+
 import PatientForm from '@/components/PatientForm';
 
 export default function AddPatientPage() {
@@ -35,6 +35,10 @@ export default function AddPatientPage() {
     if (patientId) {
       // If the URL contains an id → we are editing
       loadPatientData(patientId);
+    } else {
+      // If no patientId → we are adding a new patient, reset patientData
+      setPatientData(null);
+      setIsLoading(false);
     }
   }, [patientId]);
   // This re-runs only if patientId changes
@@ -44,27 +48,23 @@ export default function AddPatientPage() {
     setIsLoading(true); // Show loading screen
 
     try {
-      // In a real app, this should get the patient from the DATABASE
-      // But for now we use fake data ("mock data") to test the UI
+      // Fetch all patients from the JSON file via API
+      const response = await fetch('/api/patients');
       
-      // DATABASE: Load patient data
-      // const data = await window.electron.ipcRenderer.invoke('get-patient', id);
-      // setPatientData(data);
-      
-      // Mock data for testing
-      setPatientData({
-        fullName: 'chaima traia ',
-        dateOfBirth: '2005-11=29',
-        gender: 'female',
-        patientId: id,
-        phoneNumber: '06 6666 6668',
-        pathology: 'Test pathology',
-        familyHistory: '',
-        allergies: 'Penicillin',
-        previousTreatments: '',
-        currentTreatment: '',
-        notes: ''
-      });
+      if (!response.ok) {
+        throw new Error('Failed to load patients');
+      }
+
+      const patients = await response.json();
+      // Find the specific patient with matching ID
+      const patient = patients.find(p => p.patientId === id);
+
+      if (patient) {
+        setPatientData(patient);
+      } else {
+        alert('Patient not found');
+        router.push('/patients');
+      }
     } catch (error) {
       console.error('Error loading patient:', error);
       alert('Error loading patient data');
@@ -77,20 +77,36 @@ export default function AddPatientPage() {
     // This runs when the user clicks "Save" in the form
 
     try {
-      // Here we would normally send the data to the database
-      // Example: save new patient or update patient
+      // Determine if we're creating a new patient or updating an existing one
+      const method = patientId ? 'PUT' : 'POST';
+      const url = '/api/patients';
+
+      // Send the data to the API endpoint
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save patient');
+      }
+
+      // Reset patientData before navigation to ensure clean state
+      setPatientData(null);
       
-      // DATABASE: Save or update patient
-      // if (patientId) {
-      //   await window.electron.ipcRenderer.invoke('update-patient', formData);
-      // } else {
-      //   await window.electron.ipcRenderer.invoke('create-patient', formData);
-      // }
       alert('Patient saved successfully!');
 
-      router.push('/patients');
-      // After saving, go back to the patients list
+      // Use setTimeout to ensure state is reset before navigation (important for Electron)
+      setTimeout(() => {
+        router.push('/patients');
+      }, 100);
     } catch (error) {
+      console.error('Error saving patient:', error);
+      alert('Error saving patient data: ' + error.message);
       throw error; // If something goes wrong
     }
   };
@@ -124,6 +140,7 @@ export default function AddPatientPage() {
           ) : (
             // Otherwise → show the Patient form
             <PatientForm
+              key={patientId || 'new'} // Force remount when switching between new/edit
               patientData={patientData} // If null → new patient. If not null → edit.
               onSave={handleSave}       // Function that runs when user saves
               onCancel={handleCancel}   // Function that runs when user cancels

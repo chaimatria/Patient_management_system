@@ -1,43 +1,38 @@
 'use client';
-
+//patient /patient.js  --> main page for managing patient list 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
 import Sidebar from '@/SharedComponents/Sidebar';
 import Navbar from '@/SharedComponents/Navbar';
 import Footer from '@/SharedComponents/Footer';
-//deefines a React functional component 
+
+// Defines a React functional component 
 export default function PatientsPage() {
   const router = useRouter();
-  const [patients, setPatients] = useState([]); // list of alll patients 
-  const [searchQuery, setSearchQuery] = useState('');// str for search output 
+  const [patients, setPatients] = useState([]); // list of all patients 
+  const [searchQuery, setSearchQuery] = useState(''); // str for search output 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load patients from database
+  // Load patients when component mounts
   useEffect(() => {
     loadPatients();
   }, []);
 
+  // Load patients from JSON file via API
   const loadPatients = async () => {
     setIsLoading(true);
+    
     try {
-      // DATABASE: Replace with actual database call
-      // const result = await window.electron.ipcRenderer.invoke('get-all-patients');
+      // Fetch patients from the API endpoint
+      const response = await fetch('/api/patients');
       
-      // Temporary mock data
-      const mockPatients = [
-        {
-          id: 1,
-          patientId: 'PAT-2025-001',
-          fullName: 'chaima traia',
-          dateOfBirth: '2005-11-29',
-          gender: 'female',
-          phoneNumber: '06 6666 6668',
-          lastVisit: '2025-01-15'
-        }
-      ];
-      
-      setPatients(mockPatients);
+      if (!response.ok) {
+        throw new Error('Failed to load patients');
+      }
+
+      const result = await response.json();
+      setPatients(result);
     } catch (error) {
       console.error('Error loading patients:', error);
       alert('Error loading patients: ' + error.message);
@@ -53,19 +48,30 @@ export default function PatientsPage() {
   const handleEditPatient = (patientId) => {
     router.push(`/patients/add?id=${patientId}`);
   };
-// f*delete functionality not in this sprint ( REMEMBER IN SPRINT TWO ) 
-//************************************************************************ */
+
+  // Delete functionality
   const handleDeletePatient = async (patientId) => {
     if (!window.confirm('Are you sure you want to delete this patient?')) {
       return;
     }
 
     try {
-      // DATABASE: Delete patient
-      // await window.electron.ipcRenderer.invoke('delete-patient', patientId);
-      
-      // Refresh list
-      loadPatients();
+      // Send DELETE request to API
+      const response = await fetch('/api/patients', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ patientId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete patient');
+      }
+
+      // Refresh the patient list
+      await loadPatients();
+
       alert('Patient deleted successfully');
     } catch (error) {
       console.error('Error deleting patient:', error);
@@ -83,13 +89,100 @@ export default function PatientsPage() {
     }
     return age;
   };
-//search bar functionality
-//***********************************************//
-  const filteredPatients = patients.filter(patient =>
-    patient.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.patientId.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
+// Comprehensive search function - searches ALL visible fields in the table
+// Place this right before the return statement (around line 94)
+
+const filteredPatients = patients.filter(patient => {
+  const query = searchQuery.toLowerCase().trim();
+  
+  // If search is empty, show all patients
+  if (!query) return true;
+  
+  // Search by full name
+  if (patient.fullName && patient.fullName.toLowerCase().includes(query)) {
+    return true;
+  }
+  
+  // Search by patient ID
+  if (patient.patientId && patient.patientId.toLowerCase().includes(query)) {
+    return true;
+  }
+  
+  // Search by gender (exact match to avoid "male" matching "female")
+  if (patient.gender) {
+    const gender = patient.gender.toLowerCase();
+    // Check for exact match or if query is the start of gender
+    if (gender === query || gender.startsWith(query)) {
+      return true;
+    }
+  }
+  
+  // Search by phone number (remove spaces/dashes for better matching)
+  if (patient.phoneNumber) {
+    const cleanPhone = patient.phoneNumber.replace(/[\s-]/g, '');
+    const cleanQuery = query.replace(/[\s-]/g, '');
+    
+    if (cleanPhone.includes(cleanQuery)) {
+      return true;
+    }
+    
+    // Also check original format with spaces/dashes
+    if (patient.phoneNumber.toLowerCase().includes(query)) {
+      return true;
+    }
+  }
+  
+  // Search by pathology
+  if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
+    return true;
+  }
+  
+  // Search by last visit date
+  if (patient.lastVisit && patient.lastVisit.toLowerCase().includes(query)) {
+    return true;
+  }
+  
+  // Search by date of birth (supports multiple formats)
+  if (patient.dateOfBirth) {
+    const dob = patient.dateOfBirth;
+    
+    // Check if search matches full date (YYYY-MM-DD)
+    if (dob.includes(query)) {
+      return true;
+    }
+    
+    // Check if search matches formatted date parts
+    const dobFormatted = new Date(dob).toLocaleDateString('en-US'); // MM/DD/YYYY
+    if (dobFormatted.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+    // Check if search matches year only
+    const year = new Date(dob).getFullYear().toString();
+    if (year.includes(query)) {
+      return true;
+    }
+  }
+  
+  // Search by age (calculated)
+  if (patient.dateOfBirth) {
+    const age = calculateAge(patient.dateOfBirth);
+    const ageStr = age.toString();
+    
+    // Match exact age or partial (e.g., "2" matches "25", "32", etc.)
+    if (ageStr.includes(query)) {
+      return true;
+    }
+    
+    // Also match if user types "25 years", "25years", etc.
+    if (query.includes(ageStr) || `${ageStr} years`.includes(query) || `${ageStr}years`.includes(query)) {
+      return true;
+    }
+  }
+  
+  return false;
+});
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
