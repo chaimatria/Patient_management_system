@@ -103,11 +103,11 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
         if (!value.trim()) {
           newErrors.fullName = 'Full name is required';
           delete newValidFields.fullName;
-        } else if (value.trim().length < 2) {
-          newErrors.fullName = 'Full name must be at least 2 characters';
+        } else if (value.trim().length < 3) {
+          newErrors.fullName = 'Full name must be at least 3 characters';
           delete newValidFields.fullName;
-        } else if (value.trim().length > 100) {
-          newErrors.fullName = 'Full name must not exceed 100 characters';
+        } else if (value.trim().length > 50) {
+          newErrors.fullName = 'Full name must not exceed 50 characters';
           delete newValidFields.fullName;
         } else if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(value.trim())) {
           newErrors.fullName = 'Full name can only contain letters, spaces, hyphens, and apostrophes';
@@ -135,7 +135,7 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             newErrors.dateOfBirth = 'Date of birth cannot be in the future';
             delete newValidFields.dateOfBirth;
           } else if (birthDate < minDate) {
-            newErrors.dateOfBirth = 'Please enter a valid date of birth (max 150 years ago)';
+            newErrors.dateOfBirth = 'Please enter a valid date of birth (max 120 years ago)';
             delete newValidFields.dateOfBirth;
           } else {
             delete newErrors.dateOfBirth;
@@ -163,7 +163,7 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
         }
         break;
         
-      case 'phoneNumber':
+case 'phoneNumber':
   if (value && value.trim()) {
     const cleanPhone = value.replace(/[\s\-\(\)\+]/g, ''); // strip formatting chars
     const trimmed = value.trim();
@@ -224,7 +224,7 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
       const birthDate = new Date(formData.dateOfBirth);
       const today = new Date();
       const minDate = new Date();
-      minDate.setFullYear(today.getFullYear() - 150);
+      minDate.setFullYear(today.getFullYear() - 120);
       
       if (isNaN(birthDate.getTime())) {
         newErrors.dateOfBirth = 'Invalid date format';
@@ -246,7 +246,7 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
       newErrors.patientId = 'Patient ID must not exceed 50 characters';
     }
     
-    // Validate phone number if provided
+   
     if (formData.phoneNumber && formData.phoneNumber.trim()) {
       const cleanPhone = formData.phoneNumber.replace(/[\s\-\(\)\+]/g, '');
       if (!/^\d{9,15}$/.test(cleanPhone)) {
@@ -334,14 +334,45 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
     }
   };
 
-  const generatePatientId = () => {
+ const generatePatientId = async () => {
+  try {
+    // Fetch existing patients to ensure uniqueness
+    const response = await fetch('/api/patients');
+    if (!response.ok) throw new Error('Failed to fetch patients');
+    
+    const existingPatients = await response.json();
+    const existingIds = new Set(existingPatients.map(p => p.patientId));
+    
+    let newId;
+    let attempts = 0;
+    const maxAttempts = 100;
     const year = new Date().getFullYear();
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    const newId = `PAT-${year}-${random}`;
+    
+    // Try to generate a unique ID
+    do {
+      const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      newId = `PAT-${year}-${random}`;
+      attempts++;
+    } while (existingIds.has(newId) && attempts < maxAttempts);
+    
+    // If max attempts reached, use timestamp as fallback
+    if (attempts >= maxAttempts) {
+      newId = `PAT-${year}-${Date.now().toString().slice(-6)}`;
+    }
+    
     setFormData(prev => ({ ...prev, patientId: newId }));
     setTouched(prev => ({ ...prev, patientId: true }));
     validateField('patientId', newId);
-  };
+  } catch (error) {
+    console.error('Error generating patient ID:', error);
+    // Fallback to timestamp-based ID if API fails
+    const year = new Date().getFullYear();
+    const newId = `PAT-${year}-${Date.now().toString().slice(-6)}`;
+    setFormData(prev => ({ ...prev, patientId: newId }));
+    setTouched(prev => ({ ...prev, patientId: true }));
+    validateField('patientId', newId);
+  }
+};
 
   const getInputClassName = (fieldName) => {
     const baseClass = "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all";
@@ -377,10 +408,11 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
         <h1 className="text-2xl font-semibold text-gray-900">
           {patientData ? 'Edit Patient' : 'Add New Patient'}
         </h1>
-        <button
+          <button
           onClick={generatePatientId}
           type="button"
-          className="px-4 py-2 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-sm"
+          disabled={isLoading}
+          className="px-4 py-2 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Generate Patient ID
         </button>
@@ -534,7 +566,7 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
                 onBlur={handleBlur}
                 className={getInputClassName('phoneNumber')}
                 placeholder="06 1234 5678 or +212 6 12 34 56 78"
-                maxLength={20}
+                maxLength={10}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 {renderFieldIcon('phoneNumber')}

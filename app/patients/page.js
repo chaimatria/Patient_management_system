@@ -119,10 +119,10 @@ export default function PatientsPage() {
       return true;
     }
     
-    // Search by patient ID
-    if (patient.patientId && patient.patientId.toLowerCase().includes(query)) {
-      return true;
-    }
+
+if (patient.patientId && patient.patientId.toString().toLowerCase().includes(query)) {
+  return true;
+}
     
     // Search by gender (exact match to avoid "male" matching "female")
     if (patient.gender) {
@@ -133,20 +133,20 @@ export default function PatientsPage() {
       }
     }
     
-    // Search by phone number (remove spaces/dashes for better matching)
-    if (patient.phoneNumber) {
-      const cleanPhone = patient.phoneNumber.replace(/[\s-]/g, '');
-      const cleanQuery = query.replace(/[\s-]/g, '');
-      
-      if (cleanPhone.includes(cleanQuery)) {
-        return true;
-      }
-      
-      // Also check original format with spaces/dashes
-      if (patient.phoneNumber.toLowerCase().includes(query)) {
-        return true;
-      }
-    }
+if (patient.phoneNumber) {
+  const cleanPhone = patient.phoneNumber.replace(/[\s\-\(\)\+]/g, '');
+  const cleanQuery = query.replace(/[\s\-\(\)\+]/g, '');
+  
+  // Only match if the query appears as a contiguous sequence in the phone number
+  if (cleanQuery.length > 0 && /^\d+$/.test(cleanQuery) && cleanPhone.includes(cleanQuery)) {
+    return true;
+  }
+  
+  // Also check original format for non-numeric queries
+  if (!/^\d+$/.test(query) && patient.phoneNumber.toLowerCase().includes(query)) {
+    return true;
+  }
+}
     
     // Search by pathology
     if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
