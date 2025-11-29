@@ -1,5 +1,5 @@
 'use client';
-//patient /patient.js  --> main page for managing patient list 
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
@@ -26,7 +26,7 @@ export default function PatientsPage() {
     setIsLoading(true);
     
     try {
-      // Fetch patients from the API endpoint
+      // Fetch patients from the API 
       const response = await fetch('/api/patients');
       
       if (!response.ok) {
@@ -52,7 +52,7 @@ export default function PatientsPage() {
     router.push(`/patients/add?id=${patientId}`);
   };
 
-  // Delete functionality
+
   const handleDeletePatient = async (patientId, e) => {
     e.stopPropagation(); // Prevent triggering row click
     
@@ -107,14 +107,14 @@ export default function PatientsPage() {
     return age;
   };
 
-  // Comprehensive search function - searches ALL visible fields in the table
+  //  searches ALL visible fields in the table
   const filteredPatients = patients.filter(patient => {
     const query = searchQuery.toLowerCase().trim();
     
     // If search is empty, show all patients
     if (!query) return true;
     
-    // Search by full name
+    //
     if (patient.fullName && patient.fullName.toLowerCase().includes(query)) {
       return true;
     }
@@ -180,12 +180,12 @@ if (patient.phoneNumber) {
       }
     }
     
-    // Search by age (calculated)
+    // Search by age 
     if (patient.dateOfBirth) {
       const age = calculateAge(patient.dateOfBirth);
       const ageStr = age.toString();
       
-      // Match exact age or partial (e.g., "2" matches "25", "32", etc.)
+      // Match exact age or partial 
       if (ageStr.includes(query)) {
         return true;
       }
