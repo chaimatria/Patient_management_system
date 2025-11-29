@@ -14,7 +14,7 @@ export default function Sidebar() {
     { icon: Users, label: 'Patients', href: '/patients' },
     { icon: Calendar, label: 'Rendez-vous', href: '/website/appointments' },
     { icon: FileText, label: 'Rapports', href: '/website/reports' },
-    { icon: Settings, label: 'Paramètres', href: '/website/settings' },
+    { icon: Settings, label: 'Paramètres', href: '/patients/detail' },
   ];
 
   return (
