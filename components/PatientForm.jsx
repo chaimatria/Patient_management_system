@@ -1,9 +1,11 @@
-// components/PatientForm.jsx
-import React, { useState, useEffect } from 'react';
-import { Calendar, Stethoscope } from 'lucide-react';
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, Stethoscope, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function PatientForm({ patientData = null, onSave, onCancel }) {
+  const firstInputRef = useRef(null);
   const [formData, setFormData] = useState({
+    id: '',
     fullName: '',
     dateOfBirth: '',
     gender: 'male',
@@ -14,24 +16,257 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
     allergies: '',
     previousTreatments: '',
     currentTreatment: '',
-    notes: ''
+    notes: '',
+    lastVisit: ''
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [validFields, setValidFields] = useState({});
 
-  // this si the fun that fills the form fileds with the data of a patient that already exist when the modification will be made 
-  // it runs whenevr the patientData prop changes
   useEffect(() => {
     if (patientData) {
-      setFormData(patientData);
+      setFormData({
+        id: patientData.id || '',
+        fullName: patientData.fullName || '',
+        dateOfBirth: patientData.dateOfBirth || '',
+        gender: patientData.gender || 'male',
+        patientId: patientData.patientId || '',
+        phoneNumber: patientData.phoneNumber || '',
+        pathology: patientData.pathology || '',
+        familyHistory: patientData.familyHistory || '',
+        allergies: patientData.allergies || '',
+        previousTreatments: patientData.previousTreatments || '',
+        currentTreatment: patientData.currentTreatment || '',
+        notes: patientData.notes || '',
+        lastVisit: patientData.lastVisit || ''
+      });
+    } else {
+      setFormData({
+        id: '',
+        fullName: '',
+        dateOfBirth: '',
+        gender: 'male',
+        patientId: '',
+        phoneNumber: '',
+        pathology: '',
+        familyHistory: '',
+        allergies: '',
+        previousTreatments: '',
+        currentTreatment: '',
+        notes: '',
+        lastVisit: ''
+      });
+    
+      setTimeout(() => {
+        firstInputRef.current?.focus();
+      }, 0);
     }
+  
+    setIsLoading(false);
+    setErrors({});
+    setTouched({});
+    setValidFields({});
   }, [patientData]);
-// handle the form data with the new value entered by the user
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+    
+    // Real-time validation for better UX
+    if (touched[name]) {
+      validateField(name, value);
+    }
   };
-// the gender has a sprate fun , not text generic as the one bellow cuz it is not a text 
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    validateField(name, formData[name]);
+  };
+
+  const validateField = (name, value) => {
+    const newErrors = { ...errors };
+    const newValidFields = { ...validFields };
+    
+    switch (name) {
+      case 'fullName':
+        if (!value.trim()) {
+          newErrors.fullName = 'Full name is required';
+          delete newValidFields.fullName;
+        } else if (value.trim().length < 2) {
+          newErrors.fullName = 'Full name must be at least 2 characters';
+          delete newValidFields.fullName;
+        } else if (value.trim().length > 100) {
+          newErrors.fullName = 'Full name must not exceed 100 characters';
+          delete newValidFields.fullName;
+        } else if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(value.trim())) {
+          newErrors.fullName = 'Full name can only contain letters, spaces, hyphens, and apostrophes';
+          delete newValidFields.fullName;
+        } else {
+          delete newErrors.fullName;
+          newValidFields.fullName = true;
+        }
+        break;
+        
+      case 'dateOfBirth':
+        if (!value) {
+          newErrors.dateOfBirth = 'Date of birth is required';
+          delete newValidFields.dateOfBirth;
+        } else {
+          const birthDate = new Date(value);
+          const today = new Date();
+          const minDate = new Date();
+          minDate.setFullYear(today.getFullYear() - 150);
+          
+          if (isNaN(birthDate.getTime())) {
+            newErrors.dateOfBirth = 'Invalid date format';
+            delete newValidFields.dateOfBirth;
+          } else if (birthDate > today) {
+            newErrors.dateOfBirth = 'Date of birth cannot be in the future';
+            delete newValidFields.dateOfBirth;
+          } else if (birthDate < minDate) {
+            newErrors.dateOfBirth = 'Please enter a valid date of birth (max 150 years ago)';
+            delete newValidFields.dateOfBirth;
+          } else {
+            delete newErrors.dateOfBirth;
+            newValidFields.dateOfBirth = true;
+          }
+        }
+        break;
+        
+      case 'patientId':
+        if (!value.trim()) {
+          newErrors.patientId = 'Patient ID is required';
+          delete newValidFields.patientId;
+        } else if (!/^[A-Z0-9-]+$/.test(value.trim())) {
+          newErrors.patientId = 'Patient ID can only contain uppercase letters, numbers, and hyphens';
+          delete newValidFields.patientId;
+        } else if (value.trim().length < 3) {
+          newErrors.patientId = 'Patient ID must be at least 3 characters';
+          delete newValidFields.patientId;
+        } else if (value.trim().length > 50) {
+          newErrors.patientId = 'Patient ID must not exceed 50 characters';
+          delete newValidFields.patientId;
+        } else {
+          delete newErrors.patientId;
+          newValidFields.patientId = true;
+        }
+        break;
+        
+      case 'phoneNumber':
+  if (value && value.trim()) {
+    const cleanPhone = value.replace(/[\s\-\(\)\+]/g, ''); // strip formatting chars
+    const trimmed = value.trim();
+
+    // Must be exactly 10 digits
+    if (!/^\d{10}$/.test(cleanPhone)) {
+      newErrors.phoneNumber = 'Phone number must contain exactly 10 digits';
+      delete newValidFields.phoneNumber;
+      break;
+    }
+
+    // Original value too long (e.g. typing many spaces or "+213 ...")
+    if (trimmed.length > 20) {
+      newErrors.phoneNumber = 'Phone number format is too long';
+      delete newValidFields.phoneNumber;
+      break;
+    }
+
+    // Valid phone number
+    delete newErrors.phoneNumber;
+    newValidFields.phoneNumber = true;
+
+  } else {
+    // Empty: no validation error
+    delete newErrors.phoneNumber;
+    delete newValidFields.phoneNumber;
+  }
+  break;
+
+        
+      default:
+        break;
+    }
+    
+    setErrors(newErrors);
+    setValidFields(newValidFields);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validate full name
+    if (!formData.fullName?.trim()) {
+      newErrors.fullName = 'Full name is required';
+    } else if (formData.fullName.trim().length < 2) {
+      newErrors.fullName = 'Full name must be at least 2 characters';
+    } else if (formData.fullName.trim().length > 100) {
+      newErrors.fullName = 'Full name must not exceed 100 characters';
+    } else if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(formData.fullName.trim())) {
+      newErrors.fullName = 'Full name can only contain letters, spaces, hyphens, and apostrophes';
+    }
+    
+    // Validate date of birth
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = 'Date of birth is required';
+    } else {
+      const birthDate = new Date(formData.dateOfBirth);
+      const today = new Date();
+      const minDate = new Date();
+      minDate.setFullYear(today.getFullYear() - 150);
+      
+      if (isNaN(birthDate.getTime())) {
+        newErrors.dateOfBirth = 'Invalid date format';
+      } else if (birthDate > today) {
+        newErrors.dateOfBirth = 'Date of birth cannot be in the future';
+      } else if (birthDate < minDate) {
+        newErrors.dateOfBirth = 'Please enter a valid date of birth';
+      }
+    }
+    
+    // Validate patient ID
+    if (!formData.patientId?.trim()) {
+      newErrors.patientId = 'Patient ID is required';
+    } else if (!/^[A-Z0-9-]+$/.test(formData.patientId.trim())) {
+      newErrors.patientId = 'Patient ID can only contain uppercase letters, numbers, and hyphens';
+    } else if (formData.patientId.trim().length < 3) {
+      newErrors.patientId = 'Patient ID must be at least 3 characters';
+    } else if (formData.patientId.trim().length > 50) {
+      newErrors.patientId = 'Patient ID must not exceed 50 characters';
+    }
+    
+    // Validate phone number if provided
+    if (formData.phoneNumber && formData.phoneNumber.trim()) {
+      const cleanPhone = formData.phoneNumber.replace(/[\s\-\(\)\+]/g, '');
+      if (!/^\d{9,15}$/.test(cleanPhone)) {
+        newErrors.phoneNumber = 'Phone number must contain 9-15 digits';
+      } else if (formData.phoneNumber.trim().length > 20) {
+        newErrors.phoneNumber = 'Phone number format is too long';
+      }
+    }
+    
+    setErrors(newErrors);
+    setTouched({
+      fullName: true,
+      dateOfBirth: true,
+      patientId: true,
+      phoneNumber: true,
+    });
+    
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleGenderChange = (gender) => {
     setFormData(prev => ({ ...prev, gender }));
   };
@@ -47,19 +282,53 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
     }
     return age;
   };
-// this fun checks required fileds , onsave func must be DEFINEDD LATER ( REMEMBER THIS WHEN THE DATABASES THINGS ARE IMPLEMENTED  )
-//************************************************************************************ */
+
   const handleSubmit = async () => {
-    if (!formData.fullName || !formData.dateOfBirth || !formData.patientId) {
-      alert('Please fill in all required fields: Full Name, Date of Birth, and Patient ID');
+    if (isLoading) return;
+
+    if (!validateForm()) {
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField) {
+        const element = document.querySelector(`[name="${firstErrorField}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.focus();
+        }
+      }
       return;
     }
 
     setIsLoading(true);
     try {
-      await onSave(formData);
+      const dataToSave = {
+        ...formData,
+        id: formData.id || Date.now().toString(),
+        lastVisit: formData.lastVisit || new Date().toISOString().split('T')[0]
+      };
+      
+      await onSave(dataToSave);
+      
+      if (!patientData) {
+        setFormData({
+          id: '',
+          fullName: '',
+          dateOfBirth: '',
+          gender: 'male',
+          patientId: '',
+          phoneNumber: '',
+          pathology: '',
+          familyHistory: '',
+          allergies: '',
+          previousTreatments: '',
+          currentTreatment: '',
+          notes: '',
+          lastVisit: ''
+        });
+        setValidFields({});
+      }
     } catch (error) {
-      alert('Error saving patient: ' + error.message);
+      console.error('Error saving patient:', error);
+      alert('Error saving patient: ' + (error.message || 'Unknown error'));
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +336,39 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
 
   const generatePatientId = () => {
     const year = new Date().getFullYear();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    setFormData(prev => ({ ...prev, patientId: `PAT-${year}-${random}` }));
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const newId = `PAT-${year}-${random}`;
+    setFormData(prev => ({ ...prev, patientId: newId }));
+    setTouched(prev => ({ ...prev, patientId: true }));
+    validateField('patientId', newId);
+  };
+
+  const getInputClassName = (fieldName) => {
+    const baseClass = "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all";
+    
+    if (errors[fieldName] && touched[fieldName]) {
+      return `${baseClass} border-red-500 focus:ring-red-500 bg-red-50`;
+    }
+    
+    if (validFields[fieldName] && touched[fieldName]) {
+      return `${baseClass} border-green-500 focus:ring-green-500 bg-green-50`;
+    }
+    
+    return `${baseClass} border-gray-300 focus:ring-blue-500`;
+  };
+
+  const renderFieldIcon = (fieldName) => {
+    if (!touched[fieldName]) return null;
+    
+    if (errors[fieldName]) {
+      return <AlertCircle size={18} className="text-red-500" />;
+    }
+    
+    if (validFields[fieldName]) {
+      return <CheckCircle size={18} className="text-green-500" />;
+    }
+    
+    return null;
   };
 
   return (
@@ -79,7 +379,8 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
         </h1>
         <button
           onClick={generatePatientId}
-          className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          type="button"
+          className="px-4 py-2 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-sm"
         >
           Generate Patient ID
         </button>
@@ -95,32 +396,67 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Full Name <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter full name"
-            />
+            <div className="relative">
+              <input
+                ref={firstInputRef}
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                className={getInputClassName('fullName')}
+                placeholder="Enter full name"
+                required
+                maxLength={100}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {renderFieldIcon('fullName')}
+              </div>
+            </div>
+            {errors.fullName && touched.fullName && (
+              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                <AlertCircle size={12} />
+                {errors.fullName}
+              </p>
+            )}
+            {validFields.fullName && touched.fullName && !errors.fullName && (
+              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <CheckCircle size={12} />
+                Looks good!
+              </p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Date of Birth <span className="text-red-500">*</span>
             </label>
-            <input
-              type="date"
-              name="dateOfBirth"
-              value={formData.dateOfBirth}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {formData.dateOfBirth && (
-              <p className="text-xs text-gray-500 mt-1">
+            <div className="relative">
+              <input
+                type="date"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                max={new Date().toISOString().split('T')[0]}
+                className={getInputClassName('dateOfBirth')}
+                required
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                {renderFieldIcon('dateOfBirth')}
+              </div>
+            </div>
+            {errors.dateOfBirth && touched.dateOfBirth ? (
+              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                <AlertCircle size={12} />
+                {errors.dateOfBirth}
+              </p>
+            ) : formData.dateOfBirth && !errors.dateOfBirth ? (
+              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <CheckCircle size={12} />
                 Age: {calculateAge(formData.dateOfBirth)} years
               </p>
-            )}
+            ) : null}
           </div>
 
           <div>
@@ -133,7 +469,7 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
                   value="male"
                   checked={formData.gender === 'male'}
                   onChange={() => handleGenderChange('male')}
-                  className="w-4 h-4 text-blue-500"
+                  className="w-4 h-4 text-blue-500 focus:ring-blue-500"
                 />
                 <span className="ml-2 text-sm text-gray-700">Male</span>
               </label>
@@ -144,7 +480,7 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
                   value="female"
                   checked={formData.gender === 'female'}
                   onChange={() => handleGenderChange('female')}
-                  className="w-4 h-4 text-blue-500"
+                  className="w-4 h-4 text-blue-500 focus:ring-blue-500"
                 />
                 <span className="ml-2 text-sm text-gray-700">Female</span>
               </label>
@@ -155,26 +491,67 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Patient ID <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              name="patientId"
-              value={formData.patientId}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="PAT-2025-001"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                name="patientId"
+                value={formData.patientId}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                className={getInputClassName('patientId')}
+                placeholder="PAT-2025-0001"
+                required
+                maxLength={50}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {renderFieldIcon('patientId')}
+              </div>
+            </div>
+            {errors.patientId && touched.patientId && (
+              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                <AlertCircle size={12} />
+                {errors.patientId}
+              </p>
+            )}
+            {validFields.patientId && touched.patientId && !errors.patientId && (
+              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <CheckCircle size={12} />
+                Valid Patient ID
+              </p>
+            )}
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="06 6666 6666"
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number
+            </label>
+            <div className="relative">
+              <input
+                type="tel"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                className={getInputClassName('phoneNumber')}
+                placeholder="06 1234 5678 or +212 6 12 34 56 78"
+                maxLength={20}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {renderFieldIcon('phoneNumber')}
+              </div>
+            </div>
+            {errors.phoneNumber && touched.phoneNumber && (
+              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                <AlertCircle size={12} />
+                {errors.phoneNumber}
+              </p>
+            )}
+            {validFields.phoneNumber && touched.phoneNumber && !errors.phoneNumber && (
+              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <CheckCircle size={12} />
+                Valid phone number
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -194,7 +571,11 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             placeholder="Enter medical conditions, diagnoses, etc."
+            maxLength={1000}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {formData.pathology.length}/1000 characters
+          </p>
         </div>
 
         <div className="mb-6">
@@ -208,11 +589,17 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             placeholder="Enter family medical history"
+            maxLength={1000}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {formData.familyHistory.length}/1000 characters
+          </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Allergies</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Allergies
+          </label>
           <textarea
             name="allergies"
             value={formData.allergies}
@@ -220,7 +607,11 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             rows="2"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             placeholder="Enter known allergies"
+            maxLength={500}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {formData.allergies.length}/500 characters
+          </p>
         </div>
       </div>
 
@@ -239,7 +630,11 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             placeholder="Enter previous treatments and medications"
+            maxLength={1000}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {formData.previousTreatments.length}/1000 characters
+          </p>
         </div>
 
         <div>
@@ -253,7 +648,11 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             placeholder="Enter current treatments and medications"
+            maxLength={1000}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {formData.currentTreatment.length}/1000 characters
+          </p>
         </div>
       </div>
 
@@ -267,24 +666,37 @@ export default function PatientForm({ patientData = null, onSave, onCancel }) {
           rows="4"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           placeholder="Enter any additional notes or observations"
+          maxLength={2000}
         />
+        <p className="text-xs text-gray-500 mt-1">
+          {formData.notes.length}/2000 characters
+        </p>
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-3 pb-8">
         <button
+          type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
         <button
+          type="button"
           onClick={handleSubmit}
           disabled={isLoading}
-          className="px-6 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
+          className="px-6 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          {isLoading ? 'Saving...' : (patientData ? 'Update Patient' : 'Save Patient')}
+          {isLoading ? (
+            <>
+              <span className="animate-spin">⏳</span>
+              Saving...
+            </>
+          ) : (
+            patientData ? 'Update Patient' : 'Save Patient'
+          )}
         </button>
       </div>
     </div>
