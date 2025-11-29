@@ -6,6 +6,7 @@ import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
 import Sidebar from '@/SharedComponents/Sidebar';
 import Navbar from '@/SharedComponents/Navbar';
 import Footer from '@/SharedComponents/Footer';
+import PatientDetailPanel from '@/components/PatientDetailPanel';
 
 // Defines a React functional component 
 export default function PatientsPage() {
@@ -13,6 +14,7 @@ export default function PatientsPage() {
   const [patients, setPatients] = useState([]); // list of all patients 
   const [searchQuery, setSearchQuery] = useState(''); // str for search output 
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   // Load patients when component mounts
   useEffect(() => {
@@ -45,12 +47,15 @@ export default function PatientsPage() {
     router.push('/patients/add');
   };
 
-  const handleEditPatient = (patientId) => {
+  const handleEditPatient = (patientId, e) => {
+    e.stopPropagation(); // Prevent triggering row click
     router.push(`/patients/add?id=${patientId}`);
   };
 
   // Delete functionality
-  const handleDeletePatient = async (patientId) => {
+  const handleDeletePatient = async (patientId, e) => {
+    e.stopPropagation(); // Prevent triggering row click
+    
     if (!window.confirm('Are you sure you want to delete this patient?')) {
       return;
     }
@@ -79,6 +84,18 @@ export default function PatientsPage() {
     }
   };
 
+  const handlePatientClick = (patient) => {
+    setSelectedPatient(patient);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedPatient(null);
+  };
+
+  const handleViewFullProfile = (patientId) => {
+    router.push(`/patients/profile/${patientId}`);
+  };
+
   const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -90,99 +107,98 @@ export default function PatientsPage() {
     return age;
   };
 
-// Comprehensive search function - searches ALL visible fields in the table
-// Place this right before the return statement (around line 94)
+  // Comprehensive search function - searches ALL visible fields in the table
+  const filteredPatients = patients.filter(patient => {
+    const query = searchQuery.toLowerCase().trim();
+    
+    // If search is empty, show all patients
+    if (!query) return true;
+    
+    // Search by full name
+    if (patient.fullName && patient.fullName.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+    // Search by patient ID
+    if (patient.patientId && patient.patientId.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+    // Search by gender (exact match to avoid "male" matching "female")
+    if (patient.gender) {
+      const gender = patient.gender.toLowerCase();
+      // Check for exact match or if query is the start of gender
+      if (gender === query || gender.startsWith(query)) {
+        return true;
+      }
+    }
+    
+    // Search by phone number (remove spaces/dashes for better matching)
+    if (patient.phoneNumber) {
+      const cleanPhone = patient.phoneNumber.replace(/[\s-]/g, '');
+      const cleanQuery = query.replace(/[\s-]/g, '');
+      
+      if (cleanPhone.includes(cleanQuery)) {
+        return true;
+      }
+      
+      // Also check original format with spaces/dashes
+      if (patient.phoneNumber.toLowerCase().includes(query)) {
+        return true;
+      }
+    }
+    
+    // Search by pathology
+    if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+    // Search by last visit date
+    if (patient.lastVisit && patient.lastVisit.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+    // Search by date of birth (supports multiple formats)
+    if (patient.dateOfBirth) {
+      const dob = patient.dateOfBirth;
+      
+      // Check if search matches full date (YYYY-MM-DD)
+      if (dob.includes(query)) {
+        return true;
+      }
+      
+      // Check if search matches formatted date parts
+      const dobFormatted = new Date(dob).toLocaleDateString('en-US'); // MM/DD/YYYY
+      if (dobFormatted.toLowerCase().includes(query)) {
+        return true;
+      }
+      
+      // Check if search matches year only
+      const year = new Date(dob).getFullYear().toString();
+      if (year.includes(query)) {
+        return true;
+      }
+    }
+    
+    // Search by age (calculated)
+    if (patient.dateOfBirth) {
+      const age = calculateAge(patient.dateOfBirth);
+      const ageStr = age.toString();
+      
+      // Match exact age or partial (e.g., "2" matches "25", "32", etc.)
+      if (ageStr.includes(query)) {
+        return true;
+      }
+      
+      // Also match if user types "25 years", "25years", etc.
+      if (query.includes(ageStr) || `${ageStr} years`.includes(query) || `${ageStr}years`.includes(query)) {
+        return true;
+      }
+    }
+    
+    return false;
+  });
 
-const filteredPatients = patients.filter(patient => {
-  const query = searchQuery.toLowerCase().trim();
-  
-  // If search is empty, show all patients
-  if (!query) return true;
-  
-  // Search by full name
-  if (patient.fullName && patient.fullName.toLowerCase().includes(query)) {
-    return true;
-  }
-  
-  // Search by patient ID
-  if (patient.patientId && patient.patientId.toLowerCase().includes(query)) {
-    return true;
-  }
-  
-  // Search by gender (exact match to avoid "male" matching "female")
-  if (patient.gender) {
-    const gender = patient.gender.toLowerCase();
-    // Check for exact match or if query is the start of gender
-    if (gender === query || gender.startsWith(query)) {
-      return true;
-    }
-  }
-  
-  // Search by phone number (remove spaces/dashes for better matching)
-  if (patient.phoneNumber) {
-    const cleanPhone = patient.phoneNumber.replace(/[\s-]/g, '');
-    const cleanQuery = query.replace(/[\s-]/g, '');
-    
-    if (cleanPhone.includes(cleanQuery)) {
-      return true;
-    }
-    
-    // Also check original format with spaces/dashes
-    if (patient.phoneNumber.toLowerCase().includes(query)) {
-      return true;
-    }
-  }
-  
-  // Search by pathology
-  if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
-    return true;
-  }
-  
-  // Search by last visit date
-  if (patient.lastVisit && patient.lastVisit.toLowerCase().includes(query)) {
-    return true;
-  }
-  
-  // Search by date of birth (supports multiple formats)
-  if (patient.dateOfBirth) {
-    const dob = patient.dateOfBirth;
-    
-    // Check if search matches full date (YYYY-MM-DD)
-    if (dob.includes(query)) {
-      return true;
-    }
-    
-    // Check if search matches formatted date parts
-    const dobFormatted = new Date(dob).toLocaleDateString('en-US'); // MM/DD/YYYY
-    if (dobFormatted.toLowerCase().includes(query)) {
-      return true;
-    }
-    
-    // Check if search matches year only
-    const year = new Date(dob).getFullYear().toString();
-    if (year.includes(query)) {
-      return true;
-    }
-  }
-  
-  // Search by age (calculated)
-  if (patient.dateOfBirth) {
-    const age = calculateAge(patient.dateOfBirth);
-    const ageStr = age.toString();
-    
-    // Match exact age or partial (e.g., "2" matches "25", "32", etc.)
-    if (ageStr.includes(query)) {
-      return true;
-    }
-    
-    // Also match if user types "25 years", "25years", etc.
-    if (query.includes(ageStr) || `${ageStr} years`.includes(query) || `${ageStr}years`.includes(query)) {
-      return true;
-    }
-  }
-  
-  return false;
-});
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
@@ -215,7 +231,7 @@ const filteredPatients = patients.filter(patient => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="text"
-                  placeholder="Search by name or patient ID..."
+                  placeholder="Search by name, ID, phone, age, or any field..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -274,7 +290,11 @@ const filteredPatients = patients.filter(patient => {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {filteredPatients.map((patient) => (
-                      <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
+                      <tr 
+                        key={patient.id} 
+                        onClick={() => handlePatientClick(patient)}
+                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                           {patient.patientId}
                         </td>
@@ -295,14 +315,16 @@ const filteredPatients = patients.filter(patient => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
-                            onClick={() => handleEditPatient(patient.patientId)}
+                            onClick={(e) => handleEditPatient(patient.patientId, e)}
                             className="text-blue-600 hover:text-blue-900 mr-4"
+                            title="Edit Patient"
                           >
                             <Edit size={18} />
                           </button>
                           <button
-                            onClick={() => handleDeletePatient(patient.patientId)}
+                            onClick={(e) => handleDeletePatient(patient.patientId, e)}
                             className="text-red-600 hover:text-red-900"
+                            title="Delete Patient"
                           >
                             <Trash2 size={18} />
                           </button>
@@ -318,6 +340,15 @@ const filteredPatients = patients.filter(patient => {
         
         <Footer />
       </div>
+
+      {/* Patient Detail Panel */}
+      {selectedPatient && (
+        <PatientDetailPanel
+          patient={selectedPatient}
+          onClose={handleClosePanel}
+          onViewFullProfile={handleViewFullProfile}
+        />
+      )}
     </div>
   );
 }
