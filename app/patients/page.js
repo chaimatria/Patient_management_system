@@ -1,5 +1,5 @@
 'use client';
-//patient /patient.js  --> main page for managing patient list 
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
@@ -26,7 +26,7 @@ export default function PatientsPage() {
     setIsLoading(true);
     
     try {
-      // Fetch patients from the API endpoint
+      // Fetch patients from the API 
       const response = await fetch('/api/patients');
       
       if (!response.ok) {
@@ -52,7 +52,7 @@ export default function PatientsPage() {
     router.push(`/patients/add?id=${patientId}`);
   };
 
-  // Delete functionality
+
   const handleDeletePatient = async (patientId, e) => {
     e.stopPropagation(); // Prevent triggering row click
     
@@ -107,22 +107,22 @@ export default function PatientsPage() {
     return age;
   };
 
-  // Comprehensive search function - searches ALL visible fields in the table
+  //  searches ALL visible fields in the table
   const filteredPatients = patients.filter(patient => {
     const query = searchQuery.toLowerCase().trim();
     
     // If search is empty, show all patients
     if (!query) return true;
     
-    
+    //
     if (patient.fullName && patient.fullName.toLowerCase().includes(query)) {
       return true;
     }
     
-    
-    if (patient.patientId && patient.patientId.toLowerCase().includes(query)) {
-      return true;
-    }
+
+if (patient.patientId && patient.patientId.toString().toLowerCase().includes(query)) {
+  return true;
+}
     
 
     if (patient.gender) {
@@ -133,20 +133,20 @@ export default function PatientsPage() {
       }
     }
     
-    // Searching by phone number (remove spaces/dashes for better matching)
-    if (patient.phoneNumber) {
-      const cleanPhone = patient.phoneNumber.replace(/[\s-]/g, '');
-      const cleanQuery = query.replace(/[\s-]/g, '');
-      
-      if (cleanPhone.includes(cleanQuery)) {
-        return true;
-      }
-      
-      // Also check original format with spaces/dashes
-      if (patient.phoneNumber.toLowerCase().includes(query)) {
-        return true;
-      }
-    }
+if (patient.phoneNumber) {
+  const cleanPhone = patient.phoneNumber.replace(/[\s\-\(\)\+]/g, '');
+  const cleanQuery = query.replace(/[\s\-\(\)\+]/g, '');
+  
+  // Only match if the query appears as a contiguous sequence in the phone number
+  if (cleanQuery.length > 0 && /^\d+$/.test(cleanQuery) && cleanPhone.includes(cleanQuery)) {
+    return true;
+  }
+  
+  // Also check original format for non-numeric queries
+  if (!/^\d+$/.test(query) && patient.phoneNumber.toLowerCase().includes(query)) {
+    return true;
+  }
+}
     
 
     if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
@@ -180,7 +180,7 @@ export default function PatientsPage() {
       }
     }
     
-   
+    // Search by age 
     if (patient.dateOfBirth) {
       const age = calculateAge(patient.dateOfBirth);
       const ageStr = age.toString();

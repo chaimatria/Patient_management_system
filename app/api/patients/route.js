@@ -1,9 +1,9 @@
-// app/api/patients/route.js
+
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-// Path to the JSON file where patients are stored
+
 const DATA_FILE = path.join(process.cwd(), 'data', 'patients.json');
 
 // Ensure the data directory exists
@@ -14,7 +14,7 @@ function ensureDataDirectory() {
   }
 }
 
-// Read patients from JSON file
+
 function readPatients() {
   ensureDataDirectory();
   
@@ -46,7 +46,7 @@ function writePatients(patients) {
   }
 }
 
-// GET - Fetch all patients
+// get Fetch all patients
 export async function GET(request) {
   try {
     const patients = readPatients();
@@ -60,7 +60,7 @@ export async function GET(request) {
   }
 }
 
-// POST - Create a new patient
+// post Create a new patient
 export async function POST(request) {
   try {
     const newPatient = await request.json();
@@ -75,7 +75,7 @@ export async function POST(request) {
     
     const patients = readPatients();
     
-    // Check if patient ID already exists
+    // Check if id exists
     const existingPatient = patients.find(p => p.patientId === newPatient.patientId);
     if (existingPatient) {
       return NextResponse.json(
@@ -84,7 +84,7 @@ export async function POST(request) {
       );
     }
     
-    // Add unique ID and timestamp
+    // Add unique id timestamp
     const patientToAdd = {
       ...newPatient,
       id: newPatient.id || Date.now().toString(),
@@ -112,7 +112,7 @@ export async function POST(request) {
   }
 }
 
-// PUT - Update an existing patient
+// put Update an existing patient
 export async function PUT(request) {
   try {
     const updatedPatient = await request.json();
@@ -134,7 +134,7 @@ export async function PUT(request) {
       );
     }
     
-    // Update the patient while preserving createdAt
+    // Update the patient while keep createdAt
     patients[index] = {
       ...updatedPatient,
       createdAt: patients[index].createdAt,
@@ -159,7 +159,6 @@ export async function PUT(request) {
   }
 }
 
-// DELETE - Delete a patient
 export async function DELETE(request) {
   try {
     const { patientId } = await request.json();
