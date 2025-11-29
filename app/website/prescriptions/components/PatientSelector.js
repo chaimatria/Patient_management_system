@@ -1,4 +1,6 @@
 export default function PatientSelector({ patients, selectedPatient, onPatientChange }) {
+  const currentPatient = patients.find(p => p.id === selectedPatient);
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Patient Details</h3>
@@ -26,8 +28,7 @@ export default function PatientSelector({ patients, selectedPatient, onPatientCh
           </div>
         </div>
 
-        
-        {selectedPatient && (
+        {currentPatient && (
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center flex-shrink-0">
@@ -37,25 +38,15 @@ export default function PatientSelector({ patients, selectedPatient, onPatientCh
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900">
-                  {patients.find(p => p.id === selectedPatient)?.name}
+                  {currentPatient.name}
                 </p>
                 <p className="text-xs text-gray-600 mt-1">
-                  ID: {selectedPatient} | Age: {patients.find(p => p.id === selectedPatient)?.age}
+                  ID: {currentPatient.id} | Age: {currentPatient.age}
                 </p>
               </div>
             </div>
           </div>
         )}
-      </div>
-
-      
-      <div className="mt-4">
-        <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add New Patient
-        </button>
       </div>
     </div>
   );
