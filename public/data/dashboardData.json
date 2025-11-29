@@ -1,0 +1,74 @@
+{
+  "stats": [
+    {
+      "label": "Total Patients",
+      "value": "120",
+      "change": "4 nouveaux ce mois",
+      "changeType": "positive",
+      "icon": "Users"
+    },
+    {
+      "label": "Consultations à venir",
+      "value": "15",
+      "change": "3 annulations récentes",
+      "changeType": "negative",
+      "icon": "CalendarCheck"
+    },
+    {
+      "label": "Suivis en attente",
+      "value": "7",
+      "change": "2 urgents cette semaine",
+      "changeType": "warning",
+      "icon": "FileCheck"
+    }
+  ],
+  "appointments": [
+    {
+      "time": "09:00 - 09:45",
+      "patient": "Mme. Benali, Amira",
+      "type": "Consultation de routine"
+    },
+    {
+      "time": "10:00 - 10:30",
+      "patient": "M. Mahmoudi, Karim",
+      "type": "Suivi post-opératoire"
+    },
+    {
+      "time": "11:00 - 11:30",
+      "patient": "Mlle. Boudjemaa, Nour",
+      "type": "Examen annuel"
+    },
+    {
+      "time": "14:00 - 14:30",
+      "patient": "M. Sahraoui, Yacine",
+      "type": "Renouvellement ordonnance"
+    }
+  ],
+  "activities": [
+    {
+      "text": "Rendez-vous de Mme. Benali confirmé pour demain.",
+      "time": "Il y a 5 min",
+      "icon": "CalendarCheck"
+    },
+    {
+      "text": "Nouveau patient, M. Yacine Sahraoui, ajouté à la base de données.",
+      "time": "Il y a 30 min",
+      "icon": "Users"
+    },
+    {
+      "text": "Dossier de Mlle. Boudjemaa mis à jour avec de nouvelles informations médicales.",
+      "time": "Il y a 1 heure",
+      "icon": "FileText"
+    },
+    {
+      "text": "Rendez-vous de M. Mahmoudi modifié pour jeudi prochain.",
+      "time": "Il y a 2 heures",
+      "icon": "Calendar"
+    },
+    {
+      "text": "Nouvelle ordonnance générée pour Mme. Benali.",
+      "time": "Il y a 4 heures",
+      "icon": "FileCheck"
+    }
+  ]
+}
