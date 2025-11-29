@@ -114,17 +114,17 @@ export default function PatientsPage() {
     // If search is empty, show all patients
     if (!query) return true;
     
-    // Search by full name
+    
     if (patient.fullName && patient.fullName.toLowerCase().includes(query)) {
       return true;
     }
     
-    // Search by patient ID
+    
     if (patient.patientId && patient.patientId.toLowerCase().includes(query)) {
       return true;
     }
     
-    // Search by gender (exact match to avoid "male" matching "female")
+
     if (patient.gender) {
       const gender = patient.gender.toLowerCase();
       // Check for exact match or if query is the start of gender
@@ -133,7 +133,7 @@ export default function PatientsPage() {
       }
     }
     
-    // Search by phone number (remove spaces/dashes for better matching)
+    // Searching by phone number (remove spaces/dashes for better matching)
     if (patient.phoneNumber) {
       const cleanPhone = patient.phoneNumber.replace(/[\s-]/g, '');
       const cleanQuery = query.replace(/[\s-]/g, '');
@@ -148,49 +148,49 @@ export default function PatientsPage() {
       }
     }
     
-    // Search by pathology
+
     if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
       return true;
     }
     
-    // Search by last visit date
+   
     if (patient.lastVisit && patient.lastVisit.toLowerCase().includes(query)) {
       return true;
     }
     
-    // Search by date of birth (supports multiple formats)
+    
     if (patient.dateOfBirth) {
       const dob = patient.dateOfBirth;
       
-      // Check if search matches full date (YYYY-MM-DD)
+      // Checking if search matches full date (YYYY-MM-DD)
       if (dob.includes(query)) {
         return true;
       }
       
-      // Check if search matches formatted date parts
+      // Checking if search matches formatted date parts
       const dobFormatted = new Date(dob).toLocaleDateString('en-US'); // MM/DD/YYYY
       if (dobFormatted.toLowerCase().includes(query)) {
         return true;
       }
       
-      // Check if search matches year only
+      //  matches year only ?
       const year = new Date(dob).getFullYear().toString();
       if (year.includes(query)) {
         return true;
       }
     }
     
-    // Search by age (calculated)
+   
     if (patient.dateOfBirth) {
       const age = calculateAge(patient.dateOfBirth);
       const ageStr = age.toString();
       
-      // Match exact age or partial (e.g., "2" matches "25", "32", etc.)
+      // Match exact age or partial 
       if (ageStr.includes(query)) {
         return true;
       }
       
-      // Also match if user types "25 years", "25years", etc.
+      // "25 years", "25years",? etc.
       if (query.includes(ageStr) || `${ageStr} years`.includes(query) || `${ageStr}years`.includes(query)) {
         return true;
       }
