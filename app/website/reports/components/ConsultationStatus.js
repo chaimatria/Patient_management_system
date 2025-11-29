@@ -9,9 +9,9 @@ export default function ConsultationStatus() {
 
       {/* Donut Chart */}
       <div className="flex items-center justify-center mb-6">
-        <div className="relative w-64 h-64">
-          <svg viewBox="0 0 200 200" className="transform -rotate-90">
-            {/* Completed - 68% */}
+        <div className="relative w-64 h-64 flex items-center justify-center">
+          <svg viewBox="0 0 200 200" className="transform -rotate-90 w-full h-full">
+            {/* Completed - 68% (Red) - starts at top */}
             <circle
               cx="100"
               cy="100"
@@ -22,18 +22,7 @@ export default function ConsultationStatus() {
               strokeDasharray="300 1000"
               strokeDashoffset="0"
             />
-            {/* Pending - 16% */}
-            <circle
-              cx="100"
-              cy="100"
-              r="70"
-              fill="none"
-              stroke="#10b981"
-              strokeWidth="40"
-              strokeDasharray="68 1000"
-              strokeDashoffset="-300"
-            />
-            {/* Canceled - 16% */}
+            {/* Canceled - 16% (Gray) - after completed */}
             <circle
               cx="100"
               cy="100"
@@ -42,20 +31,20 @@ export default function ConsultationStatus() {
               stroke="#374151"
               strokeWidth="40"
               strokeDasharray="68 1000"
+              strokeDashoffset="-300"
+            />
+            {/* Pending - 16% (Green) - last segment */}
+            <circle
+              cx="100"
+              cy="100"
+              r="70"
+              fill="none"
+              stroke="#10b981"
+              strokeWidth="40"
+              strokeDasharray="68 1000"
               strokeDashoffset="-368"
             />
           </svg>
-          
-          {/* Labels */}
-          <div className="absolute top-8 right-0 text-right">
-            <p className="text-xs text-gray-500">Completed 68%</p>
-          </div>
-          <div className="absolute bottom-16 right-0 text-right">
-            <p className="text-xs text-gray-500">Canceled 16%</p>
-          </div>
-          <div className="absolute bottom-8 left-0">
-            <p className="text-xs text-gray-500">Pending 16%</p>
-          </div>
         </div>
       </div>
 
