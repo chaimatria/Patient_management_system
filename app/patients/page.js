@@ -124,7 +124,7 @@ if (patient.patientId && patient.patientId.toString().toLowerCase().includes(que
   return true;
 }
     
-    // Search by gender (exact match to avoid "male" matching "female")
+
     if (patient.gender) {
       const gender = patient.gender.toLowerCase();
       // Check for exact match or if query is the start of gender
@@ -148,32 +148,32 @@ if (patient.phoneNumber) {
   }
 }
     
-    // Search by pathology
+
     if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
       return true;
     }
     
-    // Search by last visit date
+   
     if (patient.lastVisit && patient.lastVisit.toLowerCase().includes(query)) {
       return true;
     }
     
-    // Search by date of birth (supports multiple formats)
+    
     if (patient.dateOfBirth) {
       const dob = patient.dateOfBirth;
       
-      // Check if search matches full date (YYYY-MM-DD)
+      // Checking if search matches full date (YYYY-MM-DD)
       if (dob.includes(query)) {
         return true;
       }
       
-      // Check if search matches formatted date parts
+      // Checking if search matches formatted date parts
       const dobFormatted = new Date(dob).toLocaleDateString('en-US'); // MM/DD/YYYY
       if (dobFormatted.toLowerCase().includes(query)) {
         return true;
       }
       
-      // Check if search matches year only
+      //  matches year only ?
       const year = new Date(dob).getFullYear().toString();
       if (year.includes(query)) {
         return true;
@@ -190,7 +190,7 @@ if (patient.phoneNumber) {
         return true;
       }
       
-      // Also match if user types "25 years", "25years", etc.
+      // "25 years", "25years",? etc.
       if (query.includes(ageStr) || `${ageStr} years`.includes(query) || `${ageStr}years`.includes(query)) {
         return true;
       }
