@@ -3,136 +3,252 @@ export default function PrescriptionPrintView({ patient, medications, clinicInfo
     med.drugName.trim() !== '' || med.dosage.trim() !== '' || med.instructions.trim() !== ''
   );
 
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const currentDate = new Date().toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
   });
 
+  const rxNumber = generateRxNumber();
+
+
+  if (activeMedications.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="hidden print:block fixed inset-0 bg-white z-50 p-12">
-      <style jsx>{`
+    <>
+      <style>{`
         @media print {
           @page {
             size: A4;
             margin: 2cm;
           }
-          body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
+          body * {
+            visibility: hidden;
+          }
+          #prescription-print-content,
+          #prescription-print-content * {
+            visibility: visible;
+          }
+          #prescription-print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
           }
         }
       `}</style>
 
-      
-      <div className="border-b-4 border-blue-600 pb-4 mb-6">
-        <div className="flex justify-between items-start">
+      <div id="prescription-print-content" className="hidden print:block" style={{ 
+        pageBreakAfter: 'always',
+        backgroundColor: 'white',
+        padding: '40px',
+        maxWidth: '210mm',
+        margin: '0 auto'
+      }}>
+        {/* header   containing doctor info */}
+        <div style={{ 
+          borderBottom: '2px solid black', 
+          paddingBottom: '20px', 
+          marginBottom: '30px' 
+        }}>
+          {/* doctor name */}
+          <h1 style={{ 
+            fontSize: '20px', 
+            fontWeight: 'bold', 
+            margin: '0 0 8px 0',
+            color: 'black'
+          }}>
+            {doctorInfo.name || 'Dr Bendounan Djilali'}
+          </h1>
+          
+          {/* specialty */}
+          <p style={{ 
+            fontSize: '16px', 
+            fontWeight: '600', 
+            margin: '0 0 12px 0',
+            color: 'black'
+          }}>
+            {doctorInfo.specialty || 'Cardiologue'}
+          </p>
+          
+          {/* city */}
+          <p style={{ 
+            fontSize: '14px', 
+            margin: '0 0 4px 0',
+            color: 'black'
+          }}>
+            {clinicInfo.city || 'Alger'}
+          </p>
+          
+          {/* contact info */}
+          <p style={{ 
+            fontSize: '12px', 
+            margin: '0 0 2px 0',
+            color: 'black'
+          }}>
+            Tél : {clinicInfo.phone || '0552265120'}
+          </p>
+          <p style={{ 
+            fontSize: '12px', 
+            margin: '0',
+            color: 'black'
+          }}>
+            N° Ordre : {doctorInfo.orderNumber || '00152017'}
+          </p>
+        </div>
+
+        {/* title - ordonnance */}
+        <div style={{ 
+          textAlign: 'center', 
+          marginBottom: '30px' 
+        }}>
+          <h2 style={{ 
+            fontSize: '24px', 
+            fontWeight: 'bold',
+            margin: '0',
+            color: 'black'
+          }}>
+            Ordonnance
+          </h2>
+        </div>
+
+        {/* date and patient info */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          marginBottom: '40px',
+          fontSize: '14px'
+        }}>
           <div>
-            <h1 className="text-3xl font-bold text-blue-600 mb-2">{clinicInfo.name}</h1>
-            <div className="text-sm text-gray-700 space-y-1">
-              <p>{clinicInfo.address}</p>
-              <p>Phone: {clinicInfo.phone} | Email: {clinicInfo.email}</p>
-            </div>
+            <p style={{ margin: '0', color: 'black' }}>
+              <strong>Faite le :</strong> {currentDate}
+            </p>
           </div>
-          <div className="text-right">
-            <p className="text-sm font-semibold text-gray-700">Ordonnance</p>
-            <p className="text-xs text-gray-600">Date: {currentDate}</p>
-          </div>
-        </div>
-      </div>
-
-      
-      {patient && (
-        <div className="mb-6 bg-gray-50 p-4 rounded">
-          <h2 className="text-lg font-bold text-gray-800 mb-3">Informations sur le patient</h2>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <span className="font-semibold">Nom :</span> {patient.name}
-            </div>
-            <div>
-              <span className="font-semibold">ID Patient :</span> {patient.id}
-            </div>
-            <div>
-              <span className="font-semibold">Date de naissance:</span> {patient.dob}
-            </div>
-            <div>
-              <span className="font-semibold">Âge :</span> {patient.age} ans
-            </div>
-            <div className="col-span-2">
-              <span className="font-semibold">Adresse :</span> {patient.address}
-            </div>
-            <div>
-              <span className="font-semibold">Téléphone :</span> {patient.phone}
-            </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ margin: '0 0 4px 0', color: 'black' }}>
+              <strong>Patient(e) :</strong> {patient?.name || 'IBACHIRENE Abdelkrim'}
+            </p>
+            <p style={{ margin: '0', fontSize: '12px', color: 'black' }}>
+              Age : {patient?.age || '43'} ans
+            </p>
           </div>
         </div>
-      )}
 
-      
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="text-5xl font-serif font-bold text-blue-600">℞</div>
-          <h2 className="text-2xl font-bold text-gray-800">Medications Prescribed</h2>
-        </div>
-
-        <div className="space-y-6">
+        {/* medications list */}
+        <div style={{ marginBottom: '60px' }}>
           {activeMedications.map((med, index) => (
-            <div key={med.id} className="border-l-4 border-blue-500 pl-4 py-2">
-              <div className="flex gap-2">
-                <span className="font-bold text-gray-700 text-lg">{index + 1}.</span>
-                <div className="flex-1">
-                  <p className="text-lg font-bold text-gray-900">
-                    {med.drugName} - {med.dosage}
+            <div key={med.id} style={{ marginBottom: '30px' }}>
+              {/* medication header with quantity */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: '8px'
+              }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ 
+                    fontSize: '14px', 
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    margin: '0',
+                    color: 'black'
+                  }}>
+                    {med.drugName} {med.dosage}
                   </p>
-                  <p className="text-base text-gray-700 mt-1">
-                    <span className="font-semibold">Sig:</span> {med.instructions}
+                </div>
+                <div style={{ marginLeft: '20px' }}>
+                  <p style={{ 
+                    fontSize: '13px', 
+                    fontWeight: '600',
+                    margin: '0',
+                    color: 'black'
+                  }}>
+                    Qte: {index + 1}
                   </p>
-                  {(med.duration || med.quantity) && (
-                    <div className="flex gap-6 mt-1 text-sm text-gray-600">
-                      {med.duration && (
-                        <span><span className="font-semibold">Durée :</span> {med.duration}</span>
-                      )}
-                      {med.quantity && (
-                        <span><span className="font-semibold">Disp:</span> {med.quantity}</span>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
+              
+              {/* instructions */}
+              <p style={{ 
+                fontSize: '13px', 
+                margin: '8px 0 0 0',
+                lineHeight: '1.6',
+                color: 'black'
+              }}>
+                {med.instructions}
+              </p>
+              
+              {/* duration */}
+              {med.duration && (
+                <p style={{ 
+                  fontSize: '13px', 
+                  margin: '4px 0 0 0',
+                  color: 'black'
+                }}>
+                  Durée : {med.duration}
+                </p>
+              )}
+              
+              {/* separator line between medications */}
+              {index < activeMedications.length - 1 && (
+                <div style={{ 
+                  borderBottom: '1px solid #ddd',
+                  marginTop: '20px'
+                }}></div>
+              )}
             </div>
           ))}
         </div>
-      </div>
 
-      
-      <div className="mb-8 p-4 bg-yellow-50 border-l-4 border-yellow-400">
-        <p className="text-sm font-semibold text-gray-800 mb-1">Instructions importantes :</p>
-        <p className="text-xs text-gray-700">
-         Cette ordonnance est valable pendant 30 jours à compter de la date d’émission.
-         Veuillez suivre attentivement les instructions de posologie.
-         Contactez votre médecin immédiatement si vous ressentez des effets indésirables.
-        </p>
-      </div>
-
-      
-      <div className="mt-12 pt-6 border-t-2 border-gray-300">
-        <div className="flex justify-between items-end">
-          <div>
-            <p className="text-xs text-gray-600 mb-1">Ceci est une ordonnance générée par ordinateur</p>
+        {/* barcode and number */}
+        <div style={{ 
+          textAlign: 'center',
+          marginTop: '80px',
+          paddingTop: '20px'
+        }}>
+          {/* simple barcode representation */}
+          <div style={{ 
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '2px',
+            marginBottom: '10px',
+            height: '50px',
+            alignItems: 'flex-end'
+          }}>
+            {[3, 1, 3, 2, 1, 3, 1, 2, 3, 1, 3, 2, 1, 3, 1, 2, 3, 1, 3, 2, 1, 3, 1, 2, 3, 1, 3, 2, 1, 3].map((width, i) => (
+              <div key={i} style={{
+                width: `${width}px`,
+                height: '40px',
+                backgroundColor: 'black'
+              }}></div>
+            ))}
           </div>
-          <div className="text-right">
-            <div className="h-16 mb-2 border-b-2 border-gray-400 w-64"></div>
-            <p className="font-bold text-gray-900 text-lg">{doctorInfo.name}</p>
-            <p className="text-sm text-gray-700">{doctorInfo.specialty}</p>
-            <p className="text-xs text-gray-600">Licence médicale : {doctorInfo.license}</p>
-          </div>
+          
+          <p style={{ 
+            fontSize: '18px', 
+            fontWeight: 'bold',
+            margin: '10px 0 4px 0',
+            color: 'black'
+          }}>
+            {rxNumber}
+          </p>
+          <p style={{ 
+            fontSize: '10px',
+            margin: '0',
+            color: '#666'
+          }}>
+            https://www.pharmanet-dz.com
+          </p>
         </div>
       </div>
-
-      
-      <div className="mt-8 text-center text-xs text-gray-500">
-        <p>© 2025 {clinicInfo.name}. Tous droits réservés.</p>
-      </div>
-    </div>
+    </>
   );
+}
+
+// Helper function to generate prescription number
+function generateRxNumber() {
+  const random = Math.floor(Math.random() * 1000);
+  return `0291-${random.toString().padStart(3, '0')}`;
 }

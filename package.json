@@ -7,13 +7,14 @@
     "dev": "concurrently \"npm run dev:next\" \"npm run dev:electron\"",
     "dev:next": "next dev --turbopack",
     "dev:electron": "wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .",
-    "build": "next build",
+         "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "electron:build": "next build && electron ."
   },
   "dependencies": {
     "better-sqlite3": "^12.4.5",
+    "html2pdf.js": "^0.12.1",
     "lucide-react": "^0.554.0",
     "next": "^16.0.4",
     "react": "^19.2.0",
