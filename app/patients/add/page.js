@@ -1,70 +1,69 @@
-'use client'; 
-// This tells Next.js that this page should run in the browser.
+'use client';
+// Page for adding or editing a patient
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-// These are layout components (just UI)
+
 import Sidebar from '@/SharedComponents/Sidebar';
 import Navbar from '@/SharedComponents/Navbar';
 import Footer from '@/SharedComponents/Footer';
 
-// The patient form component where the user fills the data
+
 import PatientForm from '@/components/PatientForm';
 
 export default function AddPatientPage() {
   const router = useRouter(); 
-  // router is used to move to another page
+  
 
   const searchParams = useSearchParams(); 
-  // searchParams allows us to read things from the URL (like ?id=123)
+  // searchParams stands for parameters allows us to read things from the URL (like ?id=123)
 
   const patientId = searchParams.get('id'); 
-  // we read the "id" that is in the URL. 
-  // If it's there → we are editing a patient
-  // If not → we are adding a new patient
+  // if id is there we edit , unless we do not
+
 
   const [patientData, setPatientData] = useState(null);
-  // This variable will hold the patient information
+  // var to hold patient info
 
   const [isLoading, setIsLoading] = useState(false);
-  // This is used to show "Loading..." while we fetch data
+  // Loading.. as the one in mobdev
 
   useEffect(() => {
     // This code runs when the page first loads
     if (patientId) {
-      // If the URL contains an id → we are editing
+      
       loadPatientData(patientId);
+    } else {
+      // If no patientId  we are adding a new patient, reset patientData
+      setPatientData(null);
+      setIsLoading(false);
     }
   }, [patientId]);
   // This re-runs only if patientId changes
 
   const loadPatientData = async (id) => {
-    // This function loads the data of the patient we want to edit
+    //  loads the data of the patient we want to edit
     setIsLoading(true); // Show loading screen
 
     try {
-      // In a real app, this should get the patient from the DATABASE
-      // But for now we use fake data ("mock data") to test the UI
+      // Fetch all patients from the JSON file via API
+      const response = await fetch('/api/patients');
       
-      // DATABASE: Load patient data
-      // const data = await window.electron.ipcRenderer.invoke('get-patient', id);
-      // setPatientData(data);
+      if (!response.ok) {
+        throw new Error('Failed to load patients');
+      }
+
+      const patients = await response.json();
       
-      // Mock data for testing
-      setPatientData({
-        fullName: 'chaima traia ',
-        dateOfBirth: '2005-11=29',
-        gender: 'female',
-        patientId: id,
-        phoneNumber: '06 6666 6668',
-        pathology: 'Test pathology',
-        familyHistory: '',
-        allergies: 'Penicillin',
-        previousTreatments: '',
-        currentTreatment: '',
-        notes: ''
-      });
+      const patient = patients.find(p => p.patientId === id);
+
+      if (patient) {
+        setPatientData(patient);
+      } else {
+        alert('Patient not found');
+        router.push('/patients');
+      }
     } catch (error) {
       console.error('Error loading patient:', error);
       alert('Error loading patient data');
@@ -74,33 +73,51 @@ export default function AddPatientPage() {
   };
 
   const handleSave = async (formData) => {
-    // This runs when the user clicks "Save" in the form
+    //save 
 
     try {
-      // Here we would normally send the data to the database
-      // Example: save new patient or update patient
+      // are we creating a new patient or updating an existing one
+      const method = patientId ? 'PUT' : 'POST';
+      const url = '/api/patients';
+
+      // send the data to the API
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save patient');
+      }
+
+      // reset patientData before navigation to ensure clean state
+      setPatientData(null);
       
-      // DATABASE: Save or update patient
-      // if (patientId) {
-      //   await window.electron.ipcRenderer.invoke('update-patient', formData);
-      // } else {
-      //   await window.electron.ipcRenderer.invoke('create-patient', formData);
-      // }
       alert('Patient saved successfully!');
 
-      router.push('/patients');
-      // After saving, go back to the patients list
+      // use setTimeout to ensure state is reset before navigation (important for Electron) 
+      // the problem that i faced of the blocking forms maybe hare , but tested with removing this part but it is stiil not working 
+      // So i kept it to pmanually reset the state before navigation
+      setTimeout(() => {
+        router.push('/patients');
+      }, 100);
     } catch (error) {
+      console.error('Error saving patient:', error);
+      alert('Error saving patient data: ' + error.message);
       throw error; // If something goes wrong
     }
   };
 
   const handleCancel = () => {
-    // This runs when the user clicks "Cancel"
+    
 
     if (window.confirm('Discard changes?')) {
       router.push('/patients'); 
-      // If user confirms → go back to patients list
+      
     }
   };
 
@@ -117,16 +134,17 @@ export default function AddPatientPage() {
         <div className="flex-1 overflow-y-auto">
 
           {isLoading ? (
-            // If loading is true → show this
+          
             <div className="flex items-center justify-center h-full">
               <p className="text-gray-500">Loading...</p>
             </div>
           ) : (
-            // Otherwise → show the Patient form
+            
             <PatientForm
-              patientData={patientData} // If null → new patient. If not null → edit.
-              onSave={handleSave}       // Function that runs when user saves
-              onCancel={handleCancel}   // Function that runs when user cancels
+              key={patientId || 'new'} 
+              patientData={patientData} 
+              onSave={handleSave}       
+              onCancel={handleCancel}   
             />
           )}
         </div>

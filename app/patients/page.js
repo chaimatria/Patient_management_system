@@ -6,38 +6,35 @@ import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
 import Sidebar from '@/SharedComponents/Sidebar';
 import Navbar from '@/SharedComponents/Navbar';
 import Footer from '@/SharedComponents/Footer';
-//deefines a React functional component 
+import PatientDetailPanel from '@/components/PatientDetailPanel';
+
+// Defines a React functional component 
 export default function PatientsPage() {
   const router = useRouter();
-  const [patients, setPatients] = useState([]); // list of alll patients 
-  const [searchQuery, setSearchQuery] = useState('');// str for search output 
+  const [patients, setPatients] = useState([]); // list of all patients 
+  const [searchQuery, setSearchQuery] = useState(''); // str for search output 
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
-  // Load patients from database
+  // Load patients when component mounts
   useEffect(() => {
     loadPatients();
   }, []);
 
+  // Load patients from JSON file via API
   const loadPatients = async () => {
     setIsLoading(true);
+    
     try {
-      // DATABASE: Replace with actual database call
-      // const result = await window.electron.ipcRenderer.invoke('get-all-patients');
+      // Fetch patients from the API 
+      const response = await fetch('/api/patients');
       
-      // Temporary mock data
-      const mockPatients = [
-        {
-          id: 1,
-          patientId: 'PAT-2025-001',
-          fullName: 'chaima traia',
-          dateOfBirth: '2005-11-29',
-          gender: 'female',
-          phoneNumber: '06 6666 6668',
-          lastVisit: '2025-01-15'
-        }
-      ];
-      
-      setPatients(mockPatients);
+      if (!response.ok) {
+        throw new Error('Failed to load patients');
+      }
+
+      const result = await response.json();
+      setPatients(result);
     } catch (error) {
       console.error('Error loading patients:', error);
       alert('Error loading patients: ' + error.message);
@@ -50,27 +47,53 @@ export default function PatientsPage() {
     router.push('/patients/add');
   };
 
-  const handleEditPatient = (patientId) => {
+  const handleEditPatient = (patientId, e) => {
+    e.stopPropagation(); // Prevent triggering row click
     router.push(`/patients/add?id=${patientId}`);
   };
-// f*delete functionality not in this sprint ( REMEMBER IN SPRINT TWO ) 
-//************************************************************************ */
-  const handleDeletePatient = async (patientId) => {
+
+
+  const handleDeletePatient = async (patientId, e) => {
+    e.stopPropagation(); // Prevent triggering row click
+    
     if (!window.confirm('Are you sure you want to delete this patient?')) {
       return;
     }
 
     try {
-      // DATABASE: Delete patient
-      // await window.electron.ipcRenderer.invoke('delete-patient', patientId);
-      
-      // Refresh list
-      loadPatients();
+      // Send DELETE request to API
+      const response = await fetch('/api/patients', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ patientId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete patient');
+      }
+
+      // Refresh the patient list
+      await loadPatients();
+
       alert('Patient deleted successfully');
     } catch (error) {
       console.error('Error deleting patient:', error);
       alert('Error deleting patient: ' + error.message);
     }
+  };
+
+  const handlePatientClick = (patient) => {
+    setSelectedPatient(patient);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedPatient(null);
+  };
+
+  const handleViewFullProfile = (patientId) => {
+    router.push(`/patients/profile/${patientId}`);
   };
 
   const calculateAge = (dob) => {
@@ -83,12 +106,98 @@ export default function PatientsPage() {
     }
     return age;
   };
-//search bar functionality
-//***********************************************//
-  const filteredPatients = patients.filter(patient =>
-    patient.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.patientId.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
+  //  searches ALL visible fields in the table
+  const filteredPatients = patients.filter(patient => {
+    const query = searchQuery.toLowerCase().trim();
+    
+    // If search is empty, show all patients
+    if (!query) return true;
+    
+    //
+    if (patient.fullName && patient.fullName.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+
+if (patient.patientId && patient.patientId.toString().toLowerCase().includes(query)) {
+  return true;
+}
+    
+
+    if (patient.gender) {
+      const gender = patient.gender.toLowerCase();
+      // Check for exact match or if query is the start of gender
+      if (gender === query || gender.startsWith(query)) {
+        return true;
+      }
+    }
+    
+if (patient.phoneNumber) {
+  const cleanPhone = patient.phoneNumber.replace(/[\s\-\(\)\+]/g, '');
+  const cleanQuery = query.replace(/[\s\-\(\)\+]/g, '');
+  
+  // Only match if the query appears as a contiguous sequence in the phone number
+  if (cleanQuery.length > 0 && /^\d+$/.test(cleanQuery) && cleanPhone.includes(cleanQuery)) {
+    return true;
+  }
+  
+  // Also check original format for non-numeric queries
+  if (!/^\d+$/.test(query) && patient.phoneNumber.toLowerCase().includes(query)) {
+    return true;
+  }
+}
+    
+
+    if (patient.pathology && patient.pathology.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+   
+    if (patient.lastVisit && patient.lastVisit.toLowerCase().includes(query)) {
+      return true;
+    }
+    
+    
+    if (patient.dateOfBirth) {
+      const dob = patient.dateOfBirth;
+      
+      // Checking if search matches full date (YYYY-MM-DD)
+      if (dob.includes(query)) {
+        return true;
+      }
+      
+      // Checking if search matches formatted date parts
+      const dobFormatted = new Date(dob).toLocaleDateString('en-US'); // MM/DD/YYYY
+      if (dobFormatted.toLowerCase().includes(query)) {
+        return true;
+      }
+      
+      //  matches year only ?
+      const year = new Date(dob).getFullYear().toString();
+      if (year.includes(query)) {
+        return true;
+      }
+    }
+    
+    // Search by age 
+    if (patient.dateOfBirth) {
+      const age = calculateAge(patient.dateOfBirth);
+      const ageStr = age.toString();
+      
+      // Match exact age or partial 
+      if (ageStr.includes(query)) {
+        return true;
+      }
+      
+      // "25 years", "25years",? etc.
+      if (query.includes(ageStr) || `${ageStr} years`.includes(query) || `${ageStr}years`.includes(query)) {
+        return true;
+      }
+    }
+    
+    return false;
+  });
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -122,7 +231,7 @@ export default function PatientsPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   type="text"
-                  placeholder="Search by name or patient ID..."
+                  placeholder="Search by name, ID, phone, age, or any field..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -181,7 +290,11 @@ export default function PatientsPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {filteredPatients.map((patient) => (
-                      <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
+                      <tr 
+                        key={patient.id} 
+                        onClick={() => handlePatientClick(patient)}
+                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                           {patient.patientId}
                         </td>
@@ -202,14 +315,16 @@ export default function PatientsPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
-                            onClick={() => handleEditPatient(patient.patientId)}
+                            onClick={(e) => handleEditPatient(patient.patientId, e)}
                             className="text-blue-600 hover:text-blue-900 mr-4"
+                            title="Edit Patient"
                           >
                             <Edit size={18} />
                           </button>
                           <button
-                            onClick={() => handleDeletePatient(patient.patientId)}
+                            onClick={(e) => handleDeletePatient(patient.patientId, e)}
                             className="text-red-600 hover:text-red-900"
+                            title="Delete Patient"
                           >
                             <Trash2 size={18} />
                           </button>
@@ -225,6 +340,15 @@ export default function PatientsPage() {
         
         <Footer />
       </div>
+
+      {/* Patient Detail Panel */}
+      {selectedPatient && (
+        <PatientDetailPanel
+          patient={selectedPatient}
+          onClose={handleClosePanel}
+          onViewFullProfile={handleViewFullProfile}
+        />
+      )}
     </div>
   );
 }
