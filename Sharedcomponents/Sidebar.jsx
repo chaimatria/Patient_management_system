@@ -76,7 +76,7 @@ export default function Sidebar() {
                 DR
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">Dr. Martin</p>
+                <p className="text-sm font-medium text-gray-800">Dr. bouzourene </p>
                 <p className="text-xs text-gray-500">Médecin généraliste</p>
               </div>
             </div>
