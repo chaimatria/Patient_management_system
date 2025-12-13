@@ -1,9 +1,10 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
-  "private": true,
+  "name": "doclink-medical",
+  "version": "1.0.0",
+  "description": "Medical Management System with Electron and SQLite",
   "main": "electron/main.js",
   "scripts": {
+<<<<<<< Updated upstream
     "dev": "concurrently \"npm run dev:next\" \"npm run dev:electron\"",
     "dev:next": "next dev --turbopack",
     "dev:electron": "wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .",
@@ -31,17 +32,62 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
     "wait-on": "^9.0.3"
+=======
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "export": "next build && next export",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "npm run export && electron-builder",
+    "electron:build:win": "npm run export && electron-builder --win",
+    "electron:build:mac": "npm run export && electron-builder --mac",
+    "electron:build:linux": "npm run export && electron-builder --linux"
+>>>>>>> Stashed changes
   },
   "build": {
-    "appId": "com.myapp.desktop",
+    "appId": "com.doclink.medical",
+    "productName": "DocLink Medical",
+    "directories": {
+      "output": "dist"
+    },
     "files": [
-      "electron/**/*",
-      ".next/**/*",
       "out/**/*",
+      "electron/**/*",
+      "lib/**/*",
       "package.json"
     ],
-    "directories": {
-      "buildResources": "assets"
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "public/icon.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "public/icon.png"
     }
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "lucide-react": "^0.561.0",
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^39.2.7",
+    "electron-builder": "^24.13.3",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.0.10",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "wait-on": "^7.2.0"
   }
 }

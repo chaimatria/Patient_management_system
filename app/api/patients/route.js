@@ -1,66 +1,119 @@
-
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { getDatabase } from '@/lib/db';
 
-
-const DATA_FILE = path.join(process.cwd(), 'data', 'patients.json');
-
-// Ensure the data directory exists
-function ensureDataDirectory() {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
+// Helper function to format patient data for frontend
+function formatPatient(patientRow, pathologyRow, treatmentRow, notesRow, lastConsultation) {
+  return {
+    id: patientRow.patient_id || Date.now().toString(),
+    patientId: patientRow.patient_id,
+    fullName: patientRow.full_name,
+    dateOfBirth: patientRow.date_of_birth,
+    gender: patientRow.gender,
+    phoneNumber: patientRow.phone_number || '',
+    weight: patientRow.weight,
+    height: patientRow.height,
+    pathology: pathologyRow?.pathology_name || '',
+    familyHistory: pathologyRow?.family_members || '',
+    allergies: pathologyRow?.allergies || '',
+    previousTreatments: treatmentRow?.previous_treatment || '',
+    currentTreatment: treatmentRow?.active_treatment || '',
+    notes: notesRow?.note_text || '',
+    lastVisit: lastConsultation?.last_visit || patientRow.consultation_date || null,
+    createdAt: patientRow.created_at || new Date().toISOString(),
+    updatedAt: patientRow.updated_at || null
+  };
 }
 
-
-function readPatients() {
-  ensureDataDirectory();
+// Get all patients with related data
+function getAllPatients() {
+  const db = getDatabase();
   
-  if (!fs.existsSync(DATA_FILE)) {
-    // If file doesn't exist, create it with empty array
-    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2));
-    return [];
-  }
+  const patients = db.prepare(`
+    SELECT * FROM patients ORDER BY created_at DESC
+  `).all();
   
-  try {
-    const data = fs.readFileSync(DATA_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading patients file:', error);
-    return [];
-  }
+  return patients.map(patient => {
+    // Get related data
+    const pathology = db.prepare(`
+      SELECT * FROM pathologies WHERE patient_id = ? ORDER BY created_at DESC LIMIT 1
+    `).get(patient.patient_id);
+    
+    const treatment = db.prepare(`
+      SELECT * FROM treatments WHERE patient_id = ? ORDER BY created_at DESC LIMIT 1
+    `).get(patient.patient_id);
+    
+    const note = db.prepare(`
+      SELECT * FROM notes WHERE patient_id = ? ORDER BY created_at DESC LIMIT 1
+    `).get(patient.patient_id);
+    
+    const lastConsultation = db.prepare(`
+      SELECT last_visit FROM consultations WHERE patient_id = ? ORDER BY consultation_date DESC LIMIT 1
+    `).get(patient.patient_id);
+    
+    return formatPatient(patient, pathology, treatment, note, lastConsultation);
+  });
 }
 
-// Write patients to JSON file
-function writePatients(patients) {
-  ensureDataDirectory();
+// Get single patient by ID
+function getPatientById(patientId) {
+  const db = getDatabase();
   
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(patients, null, 2));
-    return true;
-  } catch (error) {
-    console.error('Error writing patients file:', error);
-    return false;
-  }
+  const patient = db.prepare(`
+    SELECT * FROM patients WHERE patient_id = ?
+  `).get(patientId);
+  
+  if (!patient) return null;
+  
+  const pathology = db.prepare(`
+    SELECT * FROM pathologies WHERE patient_id = ? ORDER BY created_at DESC LIMIT 1
+  `).get(patientId);
+  
+  const treatment = db.prepare(`
+    SELECT * FROM treatments WHERE patient_id = ? ORDER BY created_at DESC LIMIT 1
+  `).get(patientId);
+  
+  const note = db.prepare(`
+    SELECT * FROM notes WHERE patient_id = ? ORDER BY created_at DESC LIMIT 1
+  `).get(patientId);
+  
+  const lastConsultation = db.prepare(`
+    SELECT last_visit FROM consultations WHERE patient_id = ? ORDER BY consultation_date DESC LIMIT 1
+  `).get(patientId);
+  
+  return formatPatient(patient, pathology, treatment, note, lastConsultation);
 }
 
-// get Fetch all patients
+// GET - Fetch all patients
 export async function GET(request) {
   try {
-    const patients = readPatients();
+    const { searchParams } = new URL(request.url);
+    const patientId = searchParams.get('id');
+    
+    if (patientId) {
+      // Get single patient
+      const patient = getPatientById(patientId);
+      if (!patient) {
+        return NextResponse.json(
+          { error: 'Patient not found' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(patient);
+    }
+    
+    // Get all patients
+    const patients = getAllPatients();
     return NextResponse.json(patients);
   } catch (error) {
     console.error('GET Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch patients' },
+      { error: 'Failed to fetch patients', details: error.message },
       { status: 500 }
     );
   }
 }
 
-// post Create a new patient
+// POST - Create a new patient
 export async function POST(request) {
   try {
     const newPatient = await request.json();
@@ -68,51 +121,90 @@ export async function POST(request) {
     // Validate required fields
     if (!newPatient.fullName || !newPatient.dateOfBirth || !newPatient.patientId) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: fullName, dateOfBirth, and patientId are required' },
         { status: 400 }
       );
     }
     
-    const patients = readPatients();
+    const db = getDatabase();
     
-    // Check if id exists
-    const existingPatient = patients.find(p => p.patientId === newPatient.patientId);
-    if (existingPatient) {
+    // Check if patient ID already exists
+    const existing = db.prepare('SELECT patient_id FROM patients WHERE patient_id = ?').get(newPatient.patientId);
+    if (existing) {
       return NextResponse.json(
         { error: 'Patient ID already exists' },
         { status: 409 }
       );
     }
     
-    // Add unique id timestamp
-    const patientToAdd = {
-      ...newPatient,
-      id: newPatient.id || Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      lastVisit: newPatient.lastVisit || new Date().toISOString().split('T')[0]
-    };
+    // Insert patient
+    const insertPatient = db.prepare(`
+      INSERT INTO patients (
+        patient_id, full_name, date_of_birth, gender, phone_number, 
+        weight, height, consultation_date
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
     
-    patients.push(patientToAdd);
+    insertPatient.run(
+      newPatient.patientId,
+      newPatient.fullName,
+      newPatient.dateOfBirth,
+      newPatient.gender || 'Other',
+      newPatient.phoneNumber || null,
+      newPatient.weight || null,
+      newPatient.height || null,
+      newPatient.lastVisit || null
+    );
     
-    const success = writePatients(patients);
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to save patient' },
-        { status: 500 }
+    // Insert pathology if provided
+    if (newPatient.pathology || newPatient.familyHistory || newPatient.allergies) {
+      const insertPathology = db.prepare(`
+        INSERT INTO pathologies (patient_id, pathology_name, family_members, allergies)
+        VALUES (?, ?, ?, ?)
+      `);
+      insertPathology.run(
+        newPatient.patientId,
+        newPatient.pathology || '',
+        newPatient.familyHistory || '',
+        newPatient.allergies || ''
       );
     }
     
-    return NextResponse.json(patientToAdd, { status: 201 });
+    // Insert treatment if provided
+    if (newPatient.previousTreatments || newPatient.currentTreatment) {
+      const insertTreatment = db.prepare(`
+        INSERT INTO treatments (patient_id, previous_treatment, active_treatment)
+        VALUES (?, ?, ?)
+      `);
+      insertTreatment.run(
+        newPatient.patientId,
+        newPatient.previousTreatments || '',
+        newPatient.currentTreatment || ''
+      );
+    }
+    
+    // Insert note if provided
+    if (newPatient.notes) {
+      const insertNote = db.prepare(`
+        INSERT INTO notes (patient_id, note_text)
+        VALUES (?, ?)
+      `);
+      insertNote.run(newPatient.patientId, newPatient.notes);
+    }
+    
+    // Return the created patient
+    const createdPatient = getPatientById(newPatient.patientId);
+    return NextResponse.json(createdPatient, { status: 201 });
   } catch (error) {
     console.error('POST Error:', error);
     return NextResponse.json(
-      { error: 'Failed to create patient' },
+      { error: 'Failed to create patient', details: error.message },
       { status: 500 }
     );
   }
 }
 
-// put Update an existing patient
+// PUT - Update an existing patient
 export async function PUT(request) {
   try {
     const updatedPatient = await request.json();
@@ -124,41 +216,124 @@ export async function PUT(request) {
       );
     }
     
-    const patients = readPatients();
-    const index = patients.findIndex(p => p.patientId === updatedPatient.patientId);
+    const db = getDatabase();
     
-    if (index === -1) {
+    // Check if patient exists
+    const existing = db.prepare('SELECT patient_id FROM patients WHERE patient_id = ?').get(updatedPatient.patientId);
+    if (!existing) {
       return NextResponse.json(
         { error: 'Patient not found' },
         { status: 404 }
       );
     }
     
-    // Update the patient while keep createdAt
-    patients[index] = {
-      ...updatedPatient,
-      createdAt: patients[index].createdAt,
-      updatedAt: new Date().toISOString()
-    };
+    // Update patient
+    const updatePatient = db.prepare(`
+      UPDATE patients SET
+        full_name = ?,
+        date_of_birth = ?,
+        gender = ?,
+        phone_number = ?,
+        weight = ?,
+        height = ?,
+        consultation_date = ?
+      WHERE patient_id = ?
+    `);
     
-    const success = writePatients(patients);
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to update patient' },
-        { status: 500 }
+    updatePatient.run(
+      updatedPatient.fullName,
+      updatedPatient.dateOfBirth,
+      updatedPatient.gender || 'Other',
+      updatedPatient.phoneNumber || null,
+      updatedPatient.weight || null,
+      updatedPatient.height || null,
+      updatedPatient.lastVisit || null,
+      updatedPatient.patientId
+    );
+    
+    // Update or insert pathology
+    const existingPathology = db.prepare('SELECT pathology_id FROM pathologies WHERE patient_id = ?').get(updatedPatient.patientId);
+    if (existingPathology) {
+      const updatePathology = db.prepare(`
+        UPDATE pathologies SET
+          pathology_name = ?,
+          family_members = ?,
+          allergies = ?
+        WHERE patient_id = ?
+      `);
+      updatePathology.run(
+        updatedPatient.pathology || '',
+        updatedPatient.familyHistory || '',
+        updatedPatient.allergies || '',
+        updatedPatient.patientId
+      );
+    } else if (updatedPatient.pathology || updatedPatient.familyHistory || updatedPatient.allergies) {
+      const insertPathology = db.prepare(`
+        INSERT INTO pathologies (patient_id, pathology_name, family_members, allergies)
+        VALUES (?, ?, ?, ?)
+      `);
+      insertPathology.run(
+        updatedPatient.patientId,
+        updatedPatient.pathology || '',
+        updatedPatient.familyHistory || '',
+        updatedPatient.allergies || ''
       );
     }
     
-    return NextResponse.json(patients[index]);
+    // Update or insert treatment
+    const existingTreatment = db.prepare('SELECT treatment_id FROM treatments WHERE patient_id = ?').get(updatedPatient.patientId);
+    if (existingTreatment) {
+      const updateTreatment = db.prepare(`
+        UPDATE treatments SET
+          previous_treatment = ?,
+          active_treatment = ?
+        WHERE patient_id = ?
+      `);
+      updateTreatment.run(
+        updatedPatient.previousTreatments || '',
+        updatedPatient.currentTreatment || '',
+        updatedPatient.patientId
+      );
+    } else if (updatedPatient.previousTreatments || updatedPatient.currentTreatment) {
+      const insertTreatment = db.prepare(`
+        INSERT INTO treatments (patient_id, previous_treatment, active_treatment)
+        VALUES (?, ?, ?)
+      `);
+      insertTreatment.run(
+        updatedPatient.patientId,
+        updatedPatient.previousTreatments || '',
+        updatedPatient.currentTreatment || ''
+      );
+    }
+    
+    // Update or insert note
+    const existingNote = db.prepare('SELECT note_id FROM notes WHERE patient_id = ?').get(updatedPatient.patientId);
+    if (existingNote) {
+      const updateNote = db.prepare(`
+        UPDATE notes SET note_text = ? WHERE patient_id = ?
+      `);
+      updateNote.run(updatedPatient.notes || '', updatedPatient.patientId);
+    } else if (updatedPatient.notes) {
+      const insertNote = db.prepare(`
+        INSERT INTO notes (patient_id, note_text)
+        VALUES (?, ?)
+      `);
+      insertNote.run(updatedPatient.patientId, updatedPatient.notes);
+    }
+    
+    // Return updated patient
+    const updated = getPatientById(updatedPatient.patientId);
+    return NextResponse.json(updated);
   } catch (error) {
     console.error('PUT Error:', error);
     return NextResponse.json(
-      { error: 'Failed to update patient' },
+      { error: 'Failed to update patient', details: error.message },
       { status: 500 }
     );
   }
 }
 
+// DELETE - Delete a patient
 export async function DELETE(request) {
   try {
     const { patientId } = await request.json();
@@ -170,23 +345,20 @@ export async function DELETE(request) {
       );
     }
     
-    const patients = readPatients();
-    const filteredPatients = patients.filter(p => p.patientId !== patientId);
+    const db = getDatabase();
     
-    if (patients.length === filteredPatients.length) {
+    // Check if patient exists
+    const existing = db.prepare('SELECT patient_id FROM patients WHERE patient_id = ?').get(patientId);
+    if (!existing) {
       return NextResponse.json(
         { error: 'Patient not found' },
         { status: 404 }
       );
     }
     
-    const success = writePatients(filteredPatients);
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to delete patient' },
-        { status: 500 }
-      );
-    }
+    // Delete patient (cascade will handle related records)
+    const deletePatient = db.prepare('DELETE FROM patients WHERE patient_id = ?');
+    deletePatient.run(patientId);
     
     return NextResponse.json(
       { message: 'Patient deleted successfully' },
@@ -195,7 +367,7 @@ export async function DELETE(request) {
   } catch (error) {
     console.error('DELETE Error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete patient' },
+      { error: 'Failed to delete patient', details: error.message },
       { status: 500 }
     );
   }

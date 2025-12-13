@@ -29,21 +29,23 @@ export default function PatientProfilePage() {
   const [patient, setPatient] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('personal');
+  const [consultations, setConsultations] = useState([]);
+  const [isLoadingConsultations, setIsLoadingConsultations] = useState(false);
 
   useEffect(() => {
     if (patientId) {
       loadPatientData(patientId);
+      loadConsultations(patientId);
     }
   }, [patientId]);
 
   const loadPatientData = async (id) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/patients');
+      const response = await fetch(`/api/patients?id=${id}`);
       if (!response.ok) throw new Error('Failed to load patient');
       
-      const patients = await response.json();
-      const foundPatient = patients.find(p => p.patientId === id);
+      const foundPatient = await response.json();
       
       if (foundPatient) {
         setPatient(foundPatient);
@@ -57,6 +59,21 @@ export default function PatientProfilePage() {
       router.push('/patients');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadConsultations = async (id) => {
+    setIsLoadingConsultations(true);
+    try {
+      const response = await fetch(`/api/consultations?patientId=${id}`);
+      if (!response.ok) throw new Error('Failed to load consultations');
+      
+      const consultationsData = await response.json();
+      setConsultations(consultationsData);
+    } catch (error) {
+      console.error('Error loading consultations:', error);
+    } finally {
+      setIsLoadingConsultations(false);
     }
   };
 
@@ -74,12 +91,35 @@ export default function PatientProfilePage() {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    try {
+      // Handle both date and datetime strings from SQLite
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch (error) {
+      return 'N/A';
+    }
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'N/A';
+    }
   };
 
   const handleEdit = () => {
@@ -113,8 +153,34 @@ export default function PatientProfilePage() {
   };
 
   const handleAddConsultation = () => {
-    // Navigate to add consultation page
     router.push(`/consultations/add?patientId=${patientId}`);
+  };
+
+  const handleEditConsultation = (consultationId) => {
+    router.push(`/consultations/add?patientId=${patientId}&id=${consultationId}`);
+  };
+
+  const handleDeleteConsultation = async (consultationId) => {
+    if (!window.confirm('Are you sure you want to delete this consultation?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/consultations', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consultationId }),
+      });
+
+      if (!response.ok) throw new Error('Failed to delete consultation');
+      
+      alert('Consultation deleted successfully');
+      // Reload consultations
+      await loadConsultations(patientId);
+    } catch (error) {
+      console.error('Error deleting consultation:', error);
+      alert('Error deleting consultation');
+    }
   };
 
   const handleCreatePrescription = () => {
@@ -257,7 +323,7 @@ export default function PatientProfilePage() {
                     <FileText size={18} />
                     <span className="text-sm font-medium">Total Consultations</span>
                   </div>
-                  <p className="text-lg font-semibold text-gray-900">0</p>
+                  <p className="text-lg font-semibold text-gray-900">{consultations.length}</p>
                 </div>
                 
                 <div className="bg-purple-50 rounded-lg p-4">
@@ -427,6 +493,11 @@ export default function PatientProfilePage() {
                     <div className="flex justify-between items-center mb-6">
                       <h2 className="text-xl font-semibold text-gray-900">
                         Consultation History
+                        {consultations.length > 0 && (
+                          <span className="ml-2 text-sm font-normal text-gray-500">
+                            ({consultations.length} {consultations.length === 1 ? 'consultation' : 'consultations'})
+                          </span>
+                        )}
                       </h2>
                       <button
                         onClick={handleAddConsultation}
@@ -437,21 +508,90 @@ export default function PatientProfilePage() {
                       </button>
                     </div>
                     
-                    <div className="bg-gray-50 rounded-lg p-12 text-center border border-gray-200">
-                      <FileText className="mx-auto text-gray-400 mb-4" size={48} />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        No consultations yet
-                      </h3>
-                      <p className="text-gray-500 mb-6">
-                        Start documenting patient consultations to track their medical journey
-                      </p>
-                      <button
-                        onClick={handleAddConsultation}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                      >
-                        Add First Consultation
-                      </button>
-                    </div>
+                    {isLoadingConsultations ? (
+                      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+                        <p className="text-gray-500">Loading consultations...</p>
+                      </div>
+                    ) : consultations.length === 0 ? (
+                      <div className="bg-gray-50 rounded-lg p-12 text-center border border-gray-200">
+                        <FileText className="mx-auto text-gray-400 mb-4" size={48} />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          No consultations yet
+                        </h3>
+                        <p className="text-gray-500 mb-6">
+                          Start documenting patient consultations to track their medical journey
+                        </p>
+                        <button
+                          onClick={handleAddConsultation}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          Add First Consultation
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {consultations.map((consultation) => (
+                          <div
+                            key={consultation.consultation_id}
+                            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <div className="flex items-center gap-3 mb-2">
+                                  <Calendar size={18} className="text-blue-500" />
+                                  <span className="text-lg font-semibold text-gray-900">
+                                    {formatDate(consultation.consultation_date)}
+                                  </span>
+                                  {consultation.total_consultations && (
+                                    <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">
+                                      Consultation #{consultation.total_consultations}
+                                    </span>
+                                  )}
+                                </div>
+                                {consultation.last_visit && (
+                                  <p className="text-sm text-gray-500 ml-7">
+                                    Last Visit: {formatDate(consultation.last_visit)}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEditConsultation(consultation.consultation_id)}
+                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                  title="Edit Consultation"
+                                >
+                                  <Edit size={18} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteConsultation(consultation.consultation_id)}
+                                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Delete Consultation"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </div>
+                            </div>
+                            
+                            {consultation.description ? (
+                              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                                  {consultation.description}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-400 italic">No description provided</p>
+                            )}
+                            
+                            <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500">
+                              Created: {formatDateTime(consultation.created_at)}
+                              {consultation.updated_at && consultation.updated_at !== consultation.created_at && (
+                                <span className="ml-4">Updated: {formatDateTime(consultation.updated_at)}</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 

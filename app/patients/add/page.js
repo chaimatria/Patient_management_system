@@ -3,12 +3,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import { ArrowLeft } from 'lucide-react';
 
 import Sidebar from '@/SharedComponents/Sidebar';
 import Navbar from '@/SharedComponents/Navbar';
 import Footer from '@/SharedComponents/Footer';
-
 
 import PatientForm from '@/components/PatientForm';
 
@@ -132,6 +131,16 @@ export default function AddPatientPage() {
 
         {/* Main content area */}
         <div className="flex-1 overflow-y-auto">
+          {/* Back Navigation */}
+          <div className="max-w-5xl mx-auto pt-8 px-8">
+            <button
+              onClick={() => router.push('/patients')}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            >
+              <ArrowLeft size={20} />
+              <span className="font-medium">Back to Patients List</span>
+            </button>
+          </div>
 
           {isLoading ? (
           
