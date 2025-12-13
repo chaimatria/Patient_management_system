@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
-import Sidebar from '@/SharedComponents/Sidebar';
-import Navbar from '@/SharedComponents/Navbar';
-import Footer from '@/SharedComponents/Footer';
+import Sidebar from '@/Sharedcomponents/Sidebar';
+import Navbar from '@/Sharedcomponents/Navbar';
+import Footer from '@/Sharedcomponents/Footer';
 import PatientDetailPanel from '@/components/PatientDetailPanel';
 
 // Defines a React functional component 

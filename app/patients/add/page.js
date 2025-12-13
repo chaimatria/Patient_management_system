@@ -5,9 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
-import Sidebar from '@/SharedComponents/Sidebar';
-import Navbar from '@/SharedComponents/Navbar';
-import Footer from '@/SharedComponents/Footer';
+import Sidebar from '@/Sharedcomponents/Sidebar';
+import Navbar from '@/Sharedcomponents/Navbar';
+import Footer from '@/Sharedcomponents/Footer';
 
 import PatientForm from '@/components/PatientForm';
 

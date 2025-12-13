@@ -17,9 +17,9 @@ import {
   Clock,
   Plus
 } from 'lucide-react';
-import Sidebar from '@/SharedComponents/Sidebar';
-import Navbar from '@/SharedComponents/Navbar';
-import Footer from '@/SharedComponents/Footer';
+import Sidebar from '@/Sharedcomponents/Sidebar';
+import Navbar from '@/Sharedcomponents/Navbar';
+import Footer from '@/Sharedcomponents/Footer';
 
 export default function PatientProfilePage() {
   const router = useRouter();
@@ -38,6 +38,27 @@ export default function PatientProfilePage() {
       loadConsultations(patientId);
     }
   }, [patientId]);
+
+  // Refresh consultations when switching to consultation tab
+  useEffect(() => {
+    if (activeTab === 'consultation' && patientId) {
+      loadConsultations(patientId);
+    }
+  }, [activeTab, patientId]);
+
+  // Refresh consultations when page becomes visible (user returns from consultation add page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && patientId && activeTab === 'consultation') {
+        loadConsultations(patientId);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [patientId, activeTab]);
 
   const loadPatientData = async (id) => {
     setIsLoading(true);
