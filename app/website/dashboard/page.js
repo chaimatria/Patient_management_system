@@ -27,7 +27,8 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/data/dashboardData.json');
+        // Fetch from SQLite-backed API route instead of static JSON
+        const response = await fetch('/api/dashboard');
         
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data');
@@ -86,7 +87,7 @@ export default function DashboardPage() {
                 <p className={`text-sm ${
                   stat.changeType === 'positive' ? 'text-green-600' :
                   stat.changeType === 'negative' ? 'text-red-600' :
-                  'text-orange-600'
+                  'text-gray-600'
                 }`}>
                   {stat.change}
                 </p>
