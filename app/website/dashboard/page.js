@@ -124,7 +124,7 @@ export default function DashboardPage() {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Actions Rapides</h3>
           <div className="space-y-3">
             <button 
-              onClick={() => router.push('/patients/add')}
+              onClick={() => router.push('/website/patients/add')}
               className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
             >
               <Users className="w-5 h-5" />

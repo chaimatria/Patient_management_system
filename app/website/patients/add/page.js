@@ -5,9 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // These are layout components (just UI)
-import Sidebar from '@/SharedComponents/Sidebar';
-import Navbar from '@/SharedComponents/Navbar';
-import Footer from '@/SharedComponents/Footer';
+
 
 // The patient form component where the user fills the data
 import PatientForm from '@/components/PatientForm';
@@ -37,60 +35,52 @@ export default function AddPatientPage() {
       loadPatientData(patientId);
     }
   }, [patientId]);
-  // This re-runs only if patientId changes
 
   const loadPatientData = async (id) => {
-    // This function loads the data of the patient we want to edit
-    setIsLoading(true); // Show loading screen
-
+    setIsLoading(true);
     try {
-      // In a real app, this should get the patient from the DATABASE
-      // But for now we use fake data ("mock data") to test the UI
-      
-      // DATABASE: Load patient data
-      // const data = await window.electron.ipcRenderer.invoke('get-patient', id);
-      // setPatientData(data);
-      
-      // Mock data for testing
-      setPatientData({
-        fullName: 'chaima traia ',
-        dateOfBirth: '2005-11=29',
-        gender: 'female',
-        patientId: id,
-        phoneNumber: '06 6666 6668',
-        pathology: 'Test pathology',
-        familyHistory: '',
-        allergies: 'Penicillin',
-        previousTreatments: '',
-        currentTreatment: '',
-        notes: ''
-      });
+      const response = await fetch(`/api/patients?id=${id}`);
+      if (!response.ok) throw new Error('Failed to load patient');
+      const data = await response.json();
+      // populate form with existing patient
+      setPatientData(data);
     } catch (error) {
       console.error('Error loading patient:', error);
       alert('Error loading patient data');
     } finally {
-      setIsLoading(false); // Hide loading screen
+      setIsLoading(false);
     }
   };
+
 
   const handleSave = async (formData) => {
     // This runs when the user clicks "Save" in the form
 
     try {
-      // Here we would normally send the data to the database
-      // Example: save new patient or update patient
-      
-      // DATABASE: Save or update patient
-      // if (patientId) {
-      //   await window.electron.ipcRenderer.invoke('update-patient', formData);
-      // } else {
-      //   await window.electron.ipcRenderer.invoke('create-patient', formData);
-      // }
+      // Call backend API to save or update
+      if (patientId) {
+        const response = await fetch('/api/patients', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...formData, patientId })
+        });
+        if (!response.ok) throw new Error('Failed to update patient');
+      } else {
+        const response = await fetch('/api/patients', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        if (!response.ok) throw new Error('Failed to create patient');
+      }
+
       alert('Patient saved successfully!');
 
-      router.push('/patients');
+      router.push('/website/patients');
       // After saving, go back to the patients list
     } catch (error) {
+      console.error('Error saving patient:', error);
+      alert('Error saving patient: ' + (error.message || 'Unknown error'));
       throw error; // If something goes wrong
     }
   };
@@ -99,41 +89,24 @@ export default function AddPatientPage() {
     // This runs when the user clicks "Cancel"
 
     if (window.confirm('Discard changes?')) {
-      router.push('/patients'); 
+      router.push('/website/patients'); 
       // If user confirms → go back to patients list
     }
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Left side menu */}
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <Navbar />
-
-        {/* Main content area */}
-        <div className="flex-1 overflow-y-auto">
-
-          {isLoading ? (
-            // If loading is true → show this
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">Loading...</p>
-            </div>
-          ) : (
-            // Otherwise → show the Patient form
-            <PatientForm
-              patientData={patientData} // If null → new patient. If not null → edit.
-              onSave={handleSave}       // Function that runs when user saves
-              onCancel={handleCancel}   // Function that runs when user cancels
-            />
-          )}
+    <div className="max-w-7xl mx-auto p-8">
+      {isLoading ? (
+        <div className="flex items-center justify-center h-48">
+          <p className="text-gray-500">Loading...</p>
         </div>
-
-        {/* Bottom of page */}
-        <Footer />
-      </div>
+      ) : (
+        <PatientForm
+          patientData={patientData}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      )}
     </div>
   );
 }

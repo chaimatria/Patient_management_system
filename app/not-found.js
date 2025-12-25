@@ -93,7 +93,7 @@ export default function NotFound() {
               Tableau de bord
             </Link>
             <Link
-              href="/patients"
+              href="/website/patients"
               className="text-blue-600 hover:text-blue-700 hover:underline"
             >
               Patients
