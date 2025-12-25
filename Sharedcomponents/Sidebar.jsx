@@ -15,7 +15,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { icon: Home, label: 'Tableau de bord', href: '/website/dashboard' },
-    { icon: Users, label: 'Patients', href: 'patients' },
+    { icon: Users, label: 'Patients', href: '/website/patients' },
     { icon: Calendar, label: 'Rendez-vous', href: '/website/appointments' },
     { icon: FileText, label: 'Rapports', href: '/website/reports' },
     { icon: Settings, label: 'Paramètres', href: '/website/settings' },

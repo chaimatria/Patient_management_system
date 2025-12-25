@@ -21,23 +21,10 @@ export default function PatientsPage() {
   const loadPatients = async () => {
     setIsLoading(true);
     try {
-      // DATABASE: Replace with actual database call
-      // const result = await window.electron.ipcRenderer.invoke('get-all-patients');
-      
-      // Temporary mock data
-      const mockPatients = [
-        {
-          id: 1,
-          patientId: 'PAT-2025-001',
-          fullName: 'chaima traia',
-          dateOfBirth: '2005-11-29',
-          gender: 'female',
-          phoneNumber: '06 6666 6668',
-          lastVisit: '2025-01-15'
-        }
-      ];
-      
-      setPatients(mockPatients);
+      const response = await fetch('/api/patients');
+      if (!response.ok) throw new Error('Failed to load patients');
+      const data = await response.json();
+      setPatients(data);
     } catch (error) {
       console.error('Error loading patients:', error);
       alert('Error loading patients: ' + error.message);
@@ -61,8 +48,14 @@ export default function PatientsPage() {
     }
 
     try {
-      // DATABASE: Delete patient
-      // await window.electron.ipcRenderer.invoke('delete-patient', patientId);
+      const response = await fetch(`/api/patients?id=${patientId}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete patient');
+      }
       
       // Refresh list
       loadPatients();

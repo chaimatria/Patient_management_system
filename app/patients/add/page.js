@@ -44,30 +44,30 @@ export default function AddPatientPage() {
     setIsLoading(true); // Show loading screen
 
     try {
-      // In a real app, this should get the patient from the DATABASE
-      // But for now we use fake data ("mock data") to test the UI
+      const response = await fetch(`/api/patients?id=${id}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          alert('Patient not found');
+          router.push('/patients');
+          return;
+        }
+        throw new Error('Failed to load patient data');
+      }
       
-      // DATABASE: Load patient data
-      // const data = await window.electron.ipcRenderer.invoke('get-patient', id);
-      // setPatientData(data);
-      
-      // Mock data for testing
+      const data = await response.json();
       setPatientData({
-        fullName: 'chaima traia ',
-        dateOfBirth: '2005-11=29',
-        gender: 'female',
-        patientId: id,
-        phoneNumber: '06 6666 6668',
-        pathology: 'Test pathology',
+        ...data,
+        // Initialize optional fields if they don't exist
+        pathology: '',
         familyHistory: '',
-        allergies: 'Penicillin',
+        allergies: '',
         previousTreatments: '',
         currentTreatment: '',
         notes: ''
       });
     } catch (error) {
       console.error('Error loading patient:', error);
-      alert('Error loading patient data');
+      alert('Error loading patient data: ' + error.message);
     } finally {
       setIsLoading(false); // Hide loading screen
     }
@@ -77,20 +77,28 @@ export default function AddPatientPage() {
     // This runs when the user clicks "Save" in the form
 
     try {
-      // Here we would normally send the data to the database
-      // Example: save new patient or update patient
+      const url = '/api/patients';
+      const method = patientId ? 'PUT' : 'POST';
       
-      // DATABASE: Save or update patient
-      // if (patientId) {
-      //   await window.electron.ipcRenderer.invoke('update-patient', formData);
-      // } else {
-      //   await window.electron.ipcRenderer.invoke('create-patient', formData);
-      // }
-      alert('Patient saved successfully!');
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
 
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save patient');
+      }
+
+      alert('Patient saved successfully!');
       router.push('/patients');
       // After saving, go back to the patients list
     } catch (error) {
+      console.error('Error saving patient:', error);
+      alert('Error saving patient: ' + error.message);
       throw error; // If something goes wrong
     }
   };
