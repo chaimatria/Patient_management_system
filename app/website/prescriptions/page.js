@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Pill, User, Printer, Save, Trash2, Calendar, Download } from 'lucide-react';
 
 export default function PrescriptionGeneratorPage() {
@@ -28,10 +29,21 @@ export default function PrescriptionGeneratorPage() {
     phone: '0552265120'
   });
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     loadPatients();
     loadMedications();
   }, []);
+
+  // Preselect a patient when navigated from a patient profile (e.g. ?patientId=...)
+  useEffect(() => {
+    const pid = searchParams.get('patientId');
+    if (pid) {
+      setSelectedPatientId(pid);
+      setUseManualEntry(false);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     console.log(' useEffect triggered - selectedPatientId:', selectedPatientId, 'useManualEntry:', useManualEntry);

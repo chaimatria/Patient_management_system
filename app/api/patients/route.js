@@ -20,7 +20,7 @@ export async function GET(request) {
     if (patientId) {
       // Get single patient
       const patient = db.prepare(`
-        SELECT patient_id, full_name, date_of_birth, phone_number, email, gender
+        SELECT patient_id, full_name, date_of_birth, phone_number, email, gender, consultation_date, pathology, family_history, allergies, previous_treatments, current_treatment, notes
         FROM patients
         WHERE patient_id = ?
       `).get(patientId);
@@ -32,21 +32,28 @@ export async function GET(request) {
         );
       }
       
-      // Convert snake_case to camelCase
+      // Convert snake_case to camelCase and include extended fields
       const formattedPatient = {
         patientId: patient.patient_id,
         fullName: patient.full_name,
         dateOfBirth: patient.date_of_birth,
         phoneNumber: patient.phone_number,
         email: patient.email,
-        gender: patient.gender
+        gender: patient.gender,
+        lastVisit: patient.consultation_date || null,
+        pathology: patient.pathology || null,
+        familyHistory: patient.family_history || null,
+        allergies: patient.allergies || null,
+        previousTreatments: patient.previous_treatments || null,
+        currentTreatment: patient.current_treatment || null,
+        notes: patient.notes || null
       };
       
       return NextResponse.json(formattedPatient);
     } else {
       // Get all patients
       const patients = db.prepare(`
-        SELECT patient_id, full_name, date_of_birth, phone_number, email, gender
+        SELECT patient_id, full_name, date_of_birth, phone_number, email, gender, consultation_date, current_treatment
         FROM patients
         ORDER BY full_name
       `).all();
@@ -58,7 +65,9 @@ export async function GET(request) {
         dateOfBirth: patient.date_of_birth,
         phoneNumber: patient.phone_number,
         email: patient.email,
-        gender: patient.gender
+        gender: patient.gender,
+        lastVisit: patient.consultation_date || null,
+        currentTreatment: patient.current_treatment || null
       }));
       
       return NextResponse.json(formattedPatients);
@@ -87,8 +96,11 @@ export async function POST(request) {
     }
     
     const stmt = db.prepare(`
-      INSERT INTO patients (patient_id, full_name, date_of_birth, gender, phone_number, email)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO patients (
+        patient_id, full_name, date_of_birth, gender, phone_number, email,
+        consultation_date, pathology, family_history, allergies, previous_treatments, current_treatment, notes
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
     stmt.run(
@@ -97,7 +109,14 @@ export async function POST(request) {
       body.dateOfBirth,
       body.gender,
       body.phoneNumber || null,
-      body.email || null
+      body.email || null,
+      body.lastVisit || null,
+      body.pathology || null,
+      body.familyHistory || null,
+      body.allergies || null,
+      body.previousTreatments || null,
+      body.currentTreatment || null,
+      body.notes || null
     );
     
     return NextResponse.json({ success: true }, { status: 201 });
@@ -117,7 +136,8 @@ export async function PUT(request) {
     
     const stmt = db.prepare(`
       UPDATE patients 
-      SET full_name = ?, date_of_birth = ?, gender = ?, phone_number = ?, email = ?
+      SET full_name = ?, date_of_birth = ?, gender = ?, phone_number = ?, email = ?,
+          consultation_date = ?, pathology = ?, family_history = ?, allergies = ?, previous_treatments = ?, current_treatment = ?, notes = ?
       WHERE patient_id = ?
     `);
     
@@ -127,6 +147,13 @@ export async function PUT(request) {
       body.gender,
       body.phoneNumber || null,
       body.email || null,
+      body.lastVisit || null,
+      body.pathology || null,
+      body.familyHistory || null,
+      body.allergies || null,
+      body.previousTreatments || null,
+      body.currentTreatment || null,
+      body.notes || null,
       body.patientId
     );
     

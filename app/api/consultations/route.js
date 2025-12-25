@@ -153,6 +153,15 @@ export async function PUT(request) {
       consultationData.lastVisit || consultationData.consultationDate,
       consultationData.consultationId
     );
+
+    // Also update patient's consultation_date to keep patient last visit in sync
+    const updatePatientConsultationDate = db.prepare(`
+      UPDATE patients SET consultation_date = ? WHERE patient_id = (SELECT patient_id FROM consultations WHERE consultation_id = ?)
+    `);
+    const newDate = consultationData.lastVisit || consultationData.consultationDate;
+    if (newDate) {
+      updatePatientConsultationDate.run(newDate, consultationData.consultationId);
+    }
     
     // Get updated consultation
     const updatedConsultation = db.prepare(`
