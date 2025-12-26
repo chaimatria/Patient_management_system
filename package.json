@@ -43,12 +43,15 @@
   },
   "dependencies": {
     "better-sqlite3": "^9.2.2",
+    "jspdf": "^3.0.4",
     "lucide-react": "^0.561.0",
     "next": "14.2.35",
+    "pdfkit": "^0.17.2",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.22",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
