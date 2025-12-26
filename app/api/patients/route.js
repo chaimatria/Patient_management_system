@@ -170,26 +170,37 @@ export async function PUT(request) {
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const patientId = searchParams.get('id');
-    
+    let patientId = searchParams.get('id');
+
+    // If no id in query params, try parsing a JSON body (supports client calls that send body)
+    if (!patientId) {
+      try {
+        const body = await request.json().catch(() => null);
+        patientId = body?.patientId || body?.id || null;
+      } catch (e) {
+        // ignore parse errors
+        patientId = null;
+      }
+    }
+
     if (!patientId) {
       return NextResponse.json(
         { error: 'Patient ID is required' },
         { status: 400 }
       );
     }
-    
+
     const db = getDatabase();
     const stmt = db.prepare('DELETE FROM patients WHERE patient_id = ?');
     const result = stmt.run(patientId);
-    
+
     if (result.changes === 0) {
       return NextResponse.json(
         { error: 'Patient not found' },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting patient:', error);
