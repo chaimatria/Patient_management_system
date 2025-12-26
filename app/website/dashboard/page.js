@@ -138,13 +138,6 @@ export default function DashboardPage() {
               <CalendarCheck className="w-5 h-5" />
               <span className="font-medium">Programmer un rendez-vous</span>
             </button>
-            <button 
-              onClick={() => router.push('/website/notes')}
-              className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
-            >
-              <FileText className="w-5 h-5" />
-              <span className="font-medium">Voir les notes récentes</span>
-            </button>
           </div>
         </section>
       </div>

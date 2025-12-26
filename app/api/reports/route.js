@@ -1,35 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 
-/**
- * Reports API Route
- * Fetches aggregated report data from SQLite database
- * 
- * Returns:
- * {
- *   stats: { totalConsultations, avgPerDay, successRate },
- *   trend: { weekly: [...], monthly: [...] },
- *   status: { completed, pending, cancelled },
- *   pathologies: [{ name, count, category }, ...],
- *   pathologiesByCount: [{ name, count }, ...]
- * }
- */
-
 export async function GET(request) {
   try {
     const db = getDatabase();
-
-    // ==========================================
-    // FETCH STATS
-    // ==========================================
     
-    // 1. Total consultations count
+    //Total consultations count
     const totalConsultationsResult = db.prepare(
       'SELECT COUNT(*) as count FROM consultations'
     ).get();
     const totalConsultations = totalConsultationsResult.count;
 
-    // 2. Average consultations per day
+    //Average consultations per day
     const dayCountResult = db.prepare(`
       SELECT COUNT(DISTINCT DATE(consultation_date)) as days 
       FROM consultations 
@@ -39,19 +21,15 @@ export async function GET(request) {
       ? Math.round(totalConsultations / dayCountResult.days) 
       : 0;
 
-    // 3. Successful resolutions percentage (using completed consultations)
+    //Successful resolutions percentage
     const completedResult = db.prepare(`
       SELECT COUNT(*) as count FROM consultations
     `).get();
     const successRate = totalConsultations > 0 
       ? Math.round((completedResult.count / totalConsultations) * 100) 
       : 0;
-
-    // ==========================================
-    // FETCH CONSULTATION TRENDS (Weekly & Monthly)
-    // ==========================================
     
-    // Weekly trend - last 8 weeks
+    // Weekly trend
     const weeklyTrend = db.prepare(`
       SELECT 
         strftime('%Y-W%W', consultation_date) as week,
@@ -69,7 +47,7 @@ export async function GET(request) {
       count: row.count || 0
     }));
 
-    // Monthly trend - last 12 months
+    // Monthly trend
     const monthlyTrend = db.prepare(`
       SELECT 
         strftime('%Y-%m', consultation_date) as month,
@@ -85,25 +63,19 @@ export async function GET(request) {
       period: row.month || 'Unknown',
       count: row.count || 0
     }));
-
-    // ==========================================
-    // FETCH CONSULTATION STATUS
-    // ==========================================
     
-    // Count consultations by status (estimated based on completion patterns)
-    // Completed: all consultations with consultation_date <= today
+    //Completed: all consultations with consultation_date <= today
     const completedCount = db.prepare(`
       SELECT COUNT(*) as count FROM consultations
       WHERE consultation_date IS NOT NULL AND DATE(consultation_date) <= DATE('now')
     `).get().count || 0;
 
-    // Pending: consultations with future dates
+    //Pending: consultations with future dates
     const pendingCount = db.prepare(`
       SELECT COUNT(*) as count FROM consultations
       WHERE consultation_date IS NOT NULL AND DATE(consultation_date) > DATE('now')
     `).get().count || 0;
 
-    // Cancelled: no direct status in schema, estimate as 10% of total
     const cancelledCount = Math.max(0, totalConsultations - completedCount - pendingCount);
 
     const statusTotal = completedCount + pendingCount + cancelledCount;
@@ -113,10 +85,7 @@ export async function GET(request) {
       cancelled: statusTotal > 0 ? Math.round((cancelledCount / statusTotal) * 100) : 0
     };
 
-    // ==========================================
-    // FETCH PATHOLOGIES (Most Common)
-    // ==========================================
-    
+
     const pathologiesData = db.prepare(`
       SELECT 
         pathology_name as name,
@@ -135,10 +104,7 @@ export async function GET(request) {
       category: p.category || 'General'
     }));
 
-    // ==========================================
-    // FETCH PATHOLOGIES BY COUNT (for bar chart)
-    // ==========================================
-    
+    //FETCH PATHOLOGIES BY COUNT (for bar chart)
     const pathologiesByCountData = db.prepare(`
       SELECT 
         pathology_name as name,
