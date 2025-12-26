@@ -1,12 +1,16 @@
 // components/CommonPathologies.jsx
-export default function CommonPathologies() {
-  const pathologies = [
-    { name: 'Common Cold', count: 320, category: 'Respiratory' },
-    { name: 'Influenza', count: 280, category: 'Respiratory' },
-    { name: 'Hypertension', count: 250, category: 'Cardiovascular' },
-    { name: 'Diabetes Mellitus', count: 210, category: 'Endocrine' },
-    { name: 'Allergies', count: 180, category: 'Immunology' },
-  ];
+export default function CommonPathologies({ data }) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-1">Most Common Pathologies</h2>
+          <p className="text-sm text-gray-500">Top conditions diagnosed in consultations.</p>
+        </div>
+        <p className="text-gray-500 text-center py-8">No pathology data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
@@ -25,7 +29,7 @@ export default function CommonPathologies() {
             </tr>
           </thead>
           <tbody>
-            {pathologies.map((pathology, idx) => (
+            {data.map((pathology, idx) => (
               <tr key={idx} className="border-b border-gray-100 last:border-0">
                 <td className="py-3 text-sm text-gray-800">{pathology.name}</td>
                 <td className="py-3 text-sm text-gray-800 text-right font-medium">{pathology.count}</td>
