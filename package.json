@@ -21,13 +21,8 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@tailwindcss/postcss": "^4",
     "autoprefixer": "^10.4.22",
-=======
-    "@tailwindcss/postcss": "^4.1.18",
-    "autoprefixer": "^10.4.23",
->>>>>>> c2d08ae41303d1e4d8a414048c86b6ddcb774a89
     "babel-plugin-react-compiler": "1.0.0",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
@@ -35,11 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "postcss": "^8.5.6",
-<<<<<<< HEAD
     "tailwindcss": "^4.1.17",
-=======
-    "tailwindcss": "^4.1.18",
->>>>>>> c2d08ae41303d1e4d8a414048c86b6ddcb774a89
     "wait-on": "^9.0.3"
   },
   "build": {
