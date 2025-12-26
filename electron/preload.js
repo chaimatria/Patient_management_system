@@ -1,16 +1,13 @@
-// electron/preload.js
-// This file runs in the renderer process before the web page loads
-// It has access to both DOM APIs and Node.js APIs
+// Preload script for Electron
+// This file is required by main.js but currently no IPC handlers are needed
+// since the app uses Next.js API routes instead of Electron IPC
 
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge } = require('electron');
 
 // Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
-contextBridge.exposeInMainWorld('electronAPI', {
-  // Patient operations
-  getPatients: () => ipcRenderer.invoke('patients:get'),
-  addPatient: (patient) => ipcRenderer.invoke('patients:add', patient),
-  editPatient: (patient) => ipcRenderer.invoke('patients:edit', patient),
-  deletePatient: (patientId) => ipcRenderer.invoke('patients:delete', patientId),
+// the contextBridge APIs without exposing Node.js internals
+contextBridge.exposeInMainWorld('electron', {
+  // Add IPC methods here if needed in the future
+  // For now, this is just a placeholder to prevent Electron errors
 });
 
