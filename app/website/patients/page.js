@@ -61,15 +61,22 @@ export default function PatientsPage() {
     }
 
     try {
-      // DATABASE: Delete patient
-      // await window.electron.ipcRenderer.invoke('delete-patient', patientId);
-      
+      // Call REST API to delete patient (supports query param or JSON body)
+      const response = await fetch(`/api/patients?id=${encodeURIComponent(patientId)}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete patient');
+      }
+
       // Refresh list
-      loadPatients();
+      await loadPatients();
       alert('Patient deleted successfully');
     } catch (error) {
       console.error('Error deleting patient:', error);
-      alert('Error deleting patient: ' + error.message);
+      alert('Error deleting patient: ' + (error.message || 'Unknown error'));
     }
   };
 
