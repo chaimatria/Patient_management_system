@@ -1,5 +1,13 @@
 // components/CommonPathologies.jsx
-export default function CommonPathologies({ pathologies = [] }) {
+export default function CommonPathologies() {
+  const pathologies = [
+    { name: 'Common Cold', count: 320, category: 'Respiratory' },
+    { name: 'Influenza', count: 280, category: 'Respiratory' },
+    { name: 'Hypertension', count: 250, category: 'Cardiovascular' },
+    { name: 'Diabetes Mellitus', count: 210, category: 'Endocrine' },
+    { name: 'Allergies', count: 180, category: 'Immunology' },
+  ];
+
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
       <div className="mb-6">
@@ -17,25 +25,17 @@ export default function CommonPathologies({ pathologies = [] }) {
             </tr>
           </thead>
           <tbody>
-            {pathologies && pathologies.length > 0 ? (
-              pathologies.map((pathology, idx) => (
-                <tr key={idx} className="border-b border-gray-100 last:border-0">
-                  <td className="py-3 text-sm text-gray-800">{pathology.name}</td>
-                  <td className="py-3 text-sm text-gray-800 text-right font-medium">{pathology.count}</td>
-                  <td className="py-3 text-right">
-                    <span className="inline-block px-3 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
-                      {pathology.category || 'General'}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="py-8 text-center text-gray-500">
-                  No pathology data available
+            {pathologies.map((pathology, idx) => (
+              <tr key={idx} className="border-b border-gray-100 last:border-0">
+                <td className="py-3 text-sm text-gray-800">{pathology.name}</td>
+                <td className="py-3 text-sm text-gray-800 text-right font-medium">{pathology.count}</td>
+                <td className="py-3 text-right">
+                  <span className="inline-block px-3 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
+                    {pathology.category}
+                  </span>
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>

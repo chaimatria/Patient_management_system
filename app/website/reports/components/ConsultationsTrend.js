@@ -1,106 +1,11 @@
 // components/ConsultationsTrend.jsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { FileDown } from 'lucide-react';
 
-export default function ConsultationsTrend({ trendData = { weekly: [], monthly: [] } }) {
+export default function ConsultationsTrend() {
   const [activeTab, setActiveTab] = useState('weekly');
-  const [exporting, setExporting] = useState(false);
-
-  const handleExportCSV = async () => {
-    try {
-      setExporting(true);
-      const response = await fetch('/api/reports/export-csv');
-      if (!response.ok) throw new Error('Export failed');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `consultations-trend-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('CSV export error:', error);
-      alert('Failed to export CSV');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const handleExportPDF = async () => {
-    try {
-      setExporting(true);
-      const response = await fetch('/api/reports/export-pdf');
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Export failed');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `consultations-trend-${new Date().toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('PDF export error:', error);
-      alert('Failed to export PDF: ' + error.message);
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  // Get the active data based on tab
-  const activeData = useMemo(() => {
-    return activeTab === 'weekly' ? trendData.weekly : trendData.monthly;
-  }, [activeTab, trendData]);
-
-  // Calculate max value for scaling
-  const maxValue = useMemo(() => {
-    if (!activeData || activeData.length === 0) return 100;
-    return Math.max(...activeData.map(d => d.count || 0), 100);
-  }, [activeData]);
-
-  // Generate SVG path for line chart
-  const generatePath = () => {
-    if (!activeData || activeData.length === 0) return '';
-    
-    const points = activeData.map((item, idx) => {
-      const x = 50 + (idx / Math.max(activeData.length - 1, 1)) * 530;
-      const y = 180 - (item.count / maxValue) * 160;
-      return { x, y };
-    });
-
-    if (points.length === 0) return '';
-    
-    let path = `M ${points[0].x},${points[0].y}`;
-    for (let i = 1; i < points.length; i++) {
-      path += ` L ${points[i].x},${points[i].y}`;
-    }
-    return path;
-  };
-
-  // Generate X-axis labels
-  const xLabels = useMemo(() => {
-    if (!activeData || activeData.length === 0) return [];
-    const step = Math.ceil(activeData.length / 4);
-    const labels = [];
-    for (let i = 0; i < activeData.length; i += step) {
-      labels.push({
-        idx: i,
-        label: activeData[i].period.substring(activeData[i].period.length - 5),
-        x: 50 + (i / Math.max(activeData.length - 1, 1)) * 530
-      });
-    }
-    return labels;
-  }, [activeData]);
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
@@ -135,19 +40,13 @@ export default function ConsultationsTrend({ trendData = { weekly: [], monthly: 
         </div>
 
         <div className="flex space-x-2">
-          <button 
-            onClick={handleExportPDF}
-            disabled={exporting}
-            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
             <FileDown className="w-4 h-4" />
-            <span>{exporting ? 'Exporting...' : 'Export PDF'}</span>
+            <span>Export PDF</span>
           </button>
-          <button 
-            onClick={handleExportCSV}
-            disabled={exporting}
-            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
             <FileDown className="w-4 h-4" />
-            <span>{exporting ? 'Exporting...' : 'Export CSV'}</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
@@ -156,10 +55,10 @@ export default function ConsultationsTrend({ trendData = { weekly: [], monthly: 
       <div className="relative h-64">
         <svg className="w-full h-full" viewBox="0 0 600 200">
           {/* Y-axis labels */}
-          <text x="20" y="20" className="text-xs fill-gray-500">{Math.round(maxValue)}</text>
-          <text x="20" y="70" className="text-xs fill-gray-500">{Math.round(maxValue * 0.75)}</text>
-          <text x="20" y="120" className="text-xs fill-gray-500">{Math.round(maxValue * 0.5)}</text>
-          <text x="20" y="170" className="text-xs fill-gray-500">{Math.round(maxValue * 0.25)}</text>
+          <text x="20" y="20" className="text-xs fill-gray-500">180</text>
+          <text x="20" y="70" className="text-xs fill-gray-500">135</text>
+          <text x="20" y="120" className="text-xs fill-gray-500">90</text>
+          <text x="20" y="170" className="text-xs fill-gray-500">45</text>
           <text x="20" y="195" className="text-xs fill-gray-500">0</text>
 
           {/* Grid lines */}
@@ -168,32 +67,55 @@ export default function ConsultationsTrend({ trendData = { weekly: [], monthly: 
           <line x1="50" y1="120" x2="580" y2="120" stroke="#f3f4f6" strokeWidth="1" />
           <line x1="50" y1="170" x2="580" y2="170" stroke="#f3f4f6" strokeWidth="1" />
 
-          {/* Data line */}
-          {activeData && activeData.length > 0 && (
-            <path
-              d={generatePath()}
-              fill="none"
-              stroke="#ef4444"
-              strokeWidth="2"
-            />
-          )}
+          {/* Completed Line */}
+          <path
+            d="M 50,80 L 125,60 L 200,75 L 275,55 L 350,50 L 425,40 L 500,50 L 580,45"
+            fill="none"
+            stroke="#ef4444"
+            strokeWidth="2"
+          />
 
-          {/* Data points */}
-          {activeData && activeData.map((item, idx) => {
-            const x = 50 + (idx / Math.max(activeData.length - 1, 1)) * 530;
-            const y = 180 - (item.count / maxValue) * 160;
-            return (
-              <circle key={idx} cx={x} cy={y} r="3" fill="#ef4444" />
-            );
-          })}
+          {/* Pending Line */}
+          <path
+            d="M 50,165 L 125,160 L 200,155 L 275,158 L 350,150 L 425,152 L 500,148 L 580,150"
+            fill="none"
+            stroke="#10b981"
+            strokeWidth="2"
+          />
+
+          {/* Canceled Line */}
+          <path
+            d="M 50,175 L 125,172 L 200,170 L 275,173 L 350,168 L 425,165 L 500,162 L 580,160"
+            fill="none"
+            stroke="#374151"
+            strokeWidth="2"
+          />
 
           {/* X-axis labels */}
-          {xLabels.map((label, idx) => (
-            <text key={idx} x={label.x} y="195" textAnchor="middle" className="text-xs fill-gray-500">
-              {label.label}
-            </text>
-          ))}
+          <text x="50" y="195" className="text-xs fill-gray-500">Week 1</text>
+          <text x="125" y="195" className="text-xs fill-gray-500">Week 2</text>
+          <text x="200" y="195" className="text-xs fill-gray-500">Week 3</text>
+          <text x="275" y="195" className="text-xs fill-gray-500">Week 4</text>
+          <text x="350" y="195" className="text-xs fill-gray-500">Week 5</text>
+          <text x="425" y="195" className="text-xs fill-gray-500">Week 6</text>
+          <text x="500" y="195" className="text-xs fill-gray-500">Week 7</text>
         </svg>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-center space-x-6 mt-4">
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <span className="text-xs text-gray-600">Completed</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span className="text-xs text-gray-600">Pending</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-gray-800 rounded-full"></div>
+          <span className="text-xs text-gray-600">Canceled</span>
+        </div>
       </div>
     </div>
   );

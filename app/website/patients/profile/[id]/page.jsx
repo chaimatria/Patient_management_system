@@ -46,11 +46,12 @@ export default function PatientProfilePage() {
     }
   }, [activeTab, patientId]);
 
-  // Refresh consultations when page becomes visible (user returns from consultation add page)
+  // Refresh consultations and patient data when page becomes visible (user returns from consultation add page)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && patientId && activeTab === 'consultation') {
         loadConsultations(patientId);
+        loadPatientData(patientId);
       }
     };
 
@@ -72,12 +73,12 @@ export default function PatientProfilePage() {
         setPatient(foundPatient);
       } else {
         alert('Patient not found');
-        router.push('/patients');
+        router.push('/website/patients');
       }
     } catch (error) {
-      console.error('Error loading patient:', error);
+        console.error('Error loading patient:', error);
       alert('Error loading patient data');
-      router.push('/patients');
+      router.push('/website/patients');
     } finally {
       setIsLoading(false);
     }
@@ -144,7 +145,7 @@ export default function PatientProfilePage() {
   };
 
   const handleEdit = () => {
-    router.push(`/patients/add?id=${patientId}`);
+    router.push(`/website/patients/add?id=${patientId}`);
   };
 
   const handleDelete = async () => {
@@ -162,7 +163,7 @@ export default function PatientProfilePage() {
       if (!response.ok) throw new Error('Failed to delete patient');
       
       alert('Patient deleted successfully');
-      router.push('/patients');
+      router.push('/website/patients');
     } catch (error) {
       console.error('Error deleting patient:', error);
       alert('Error deleting patient');
@@ -170,15 +171,15 @@ export default function PatientProfilePage() {
   };
 
   const handleBack = () => {
-    router.push('/patients');
+    router.push('/website/patients');
   };
 
   const handleAddConsultation = () => {
-    router.push(`/consultations/add?patientId=${patientId}`);
+    router.push(`/website/consultations/add?patientId=${patientId}`);
   };
 
   const handleEditConsultation = (consultationId) => {
-    router.push(`/consultations/add?patientId=${patientId}&id=${consultationId}`);
+    router.push(`/website/consultations/add?patientId=${patientId}&id=${consultationId}`);
   };
 
   const handleDeleteConsultation = async (consultationId) => {
@@ -198,28 +199,51 @@ export default function PatientProfilePage() {
       alert('Consultation deleted successfully');
       // Reload consultations
       await loadConsultations(patientId);
+      // Also refresh patient data to reflect any changes in last visit
+      await loadPatientData(patientId);
     } catch (error) {
       console.error('Error deleting consultation:', error);
       alert('Error deleting consultation');
     }
   };
 
+  // Mark a consultation as the patient's last visit (updates consultation.last_visit and patient.consultation_date)
+  const handleMarkAsLastVisit = async (consultationId, consultationDate) => {
+    if (!window.confirm('Set this consultation as the last visit for the patient?')) return;
+    try {
+      const response = await fetch('/api/consultations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          consultationId,
+          lastVisit: consultationDate,
+          consultationDate: consultationDate
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to set last visit');
+      }
+
+      alert('Last visit updated');
+      await loadConsultations(patientId);
+      await loadPatientData(patientId);
+    } catch (error) {
+      console.error('Error setting last visit:', error);
+      alert('Error setting last visit: ' + error.message);
+    }
+  };
+
   const handleCreatePrescription = () => {
-    // Navigate to create prescription page
-    router.push(`/prescriptions/add?patientId=${patientId}`);
+    // Navigate to prescription page and preselect patient
+    router.push(`/website/prescriptions?patientId=${patientId}`);
   };
 
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <Navbar />
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-gray-500">Loading patient data...</p>
-          </div>
-          <Footer />
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <p className="text-gray-500">Loading patient data...</p>
       </div>
     );
   }
@@ -237,14 +261,7 @@ export default function PatientProfilePage() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
-        
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-8">
             {/* Back Button */}
             <button
               onClick={handleBack}
@@ -328,7 +345,7 @@ export default function PatientProfilePage() {
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
+              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-200">
                 <div className="bg-blue-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 text-blue-600 mb-1">
                     <Clock size={18} />
@@ -347,15 +364,7 @@ export default function PatientProfilePage() {
                   <p className="text-lg font-semibold text-gray-900">{consultations.length}</p>
                 </div>
                 
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-purple-600 mb-1">
-                    <Pill size={18} />
-                    <span className="text-sm font-medium">Active Prescriptions</span>
-                  </div>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {patient.currentTreatment ? 'Yes' : 'None'}
-                  </p>
-                </div>
+
               </div>
             </div>
 
@@ -577,6 +586,13 @@ export default function PatientProfilePage() {
                               </div>
                               <div className="flex gap-2">
                                 <button
+                                  onClick={() => handleMarkAsLastVisit(consultation.consultation_id, consultation.consultation_date)}
+                                  className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                                  title="Mark as Last Visit"
+                                >
+                                  <Clock size={18} />
+                                </button>
+                                <button
                                   onClick={() => handleEditConsultation(consultation.consultation_id)}
                                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                   title="Edit Consultation"
@@ -687,10 +703,5 @@ export default function PatientProfilePage() {
               </div>
             </div>
           </div>
-        </div>
-        
-        <Footer />
-      </div>
-    </div>
   );
 }

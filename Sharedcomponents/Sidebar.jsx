@@ -15,7 +15,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { icon: Home, label: 'Tableau de bord', href: '/website/dashboard' },
-    { icon: Users, label: 'Patients', href: '/patients' },
+    { icon: Users, label: 'Patients', href: '/website/patients' },
     { icon: Calendar, label: 'Rendez-vous', href: '/website/appointments' },
     { icon: FileText, label: 'Rapports', href: '/website/reports' },
     { icon: Settings, label: 'Paramètres', href: '/website/settings' },
@@ -76,7 +76,7 @@ export default function Sidebar() {
                 DR
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">Dr. bouzourene </p>
+                <p className="text-sm font-medium text-gray-800">Dr. Martin</p>
                 <p className="text-xs text-gray-500">Médecin généraliste</p>
               </div>
             </div>

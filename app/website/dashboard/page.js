@@ -27,8 +27,7 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        // Fetch from SQLite-backed API route instead of static JSON
-        const response = await fetch('/api/dashboard');
+        const response = await fetch('/data/dashboardData.json');
         
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data');
@@ -87,7 +86,7 @@ export default function DashboardPage() {
                 <p className={`text-sm ${
                   stat.changeType === 'positive' ? 'text-green-600' :
                   stat.changeType === 'negative' ? 'text-red-600' :
-                  'text-gray-600'
+                  'text-orange-600'
                 }`}>
                   {stat.change}
                 </p>
@@ -125,7 +124,7 @@ export default function DashboardPage() {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Actions Rapides</h3>
           <div className="space-y-3">
             <button 
-              onClick={() => router.push('/patients/add')}
+              onClick={() => router.push('/website/patients/add')}
               className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
             >
               <Users className="w-5 h-5" />
@@ -137,6 +136,13 @@ export default function DashboardPage() {
             >
               <CalendarCheck className="w-5 h-5" />
               <span className="font-medium">Programmer un rendez-vous</span>
+            </button>
+            <button 
+              onClick={() => router.push('/website/notes')}
+              className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
+            >
+              <FileText className="w-5 h-5" />
+              <span className="font-medium">Voir les notes récentes</span>
             </button>
           </div>
         </section>

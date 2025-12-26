@@ -8,10 +8,10 @@ export default function BottomBar() {
   const pathname = usePathname();
 
   const items = [
-    { icon: Home, label: 'Accueil', href: '/dashboard' },
-    { icon: Users, label: 'Patients', href: '/patients' },
-    { icon: Calendar, label: 'Agenda', href: '/appointments' },
-    { icon: Settings, label: 'Plus', href: '/settings' },
+    { icon: Home, label: 'Accueil', href: '/website/dashboard' },
+    { icon: Users, label: 'Patients', href: '/website/patients' },
+    { icon: Calendar, label: 'Agenda', href: '/website/appointments' },
+    { icon: Settings, label: 'Plus', href: '/website/settings' },
   ];
 
   return (

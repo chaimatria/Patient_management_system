@@ -3,9 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Calendar, FileText, Save, X } from 'lucide-react';
-import Sidebar from '@/Sharedcomponents/Sidebar';
-import Navbar from '@/Sharedcomponents/Navbar';
-import Footer from '@/Sharedcomponents/Footer';
+
 
 export default function AddConsultationPage() {
   const router = useRouter();
@@ -43,7 +41,7 @@ export default function AddConsultationPage() {
     } catch (error) {
       console.error('Error loading patient:', error);
       alert('Error loading patient data');
-      router.push('/patients');
+      router.push('/website/patients');
     } finally {
       setIsLoadingPatient(false);
     }
@@ -132,11 +130,11 @@ export default function AddConsultationPage() {
 
       alert(consultationId ? 'Consultation updated successfully!' : 'Consultation created successfully!');
       
-      // Navigate back to patient profile
+      // Navigate back to patient profile (use website routes)
       if (patientId) {
-        router.push(`/patients/profile/${patientId}`);
+        router.push(`/website/patients/profile/${patientId}`);
       } else {
-        router.push('/patients');
+        router.push('/website/patients');
       }
     } catch (error) {
       console.error('Error saving consultation:', error);
@@ -149,40 +147,29 @@ export default function AddConsultationPage() {
   const handleCancel = () => {
     if (window.confirm('Discard changes?')) {
       if (patientId) {
-        router.push(`/patients/profile/${patientId}`);
+        router.push(`/website/patients/profile/${patientId}`);
       } else {
-        router.push('/patients');
+        router.push('/website/patients');
       }
     }
   };
 
   if (isLoadingPatient) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <Navbar />
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-gray-500">Loading patient data...</p>
-          </div>
-          <Footer />
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">Loading patient data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
-        
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto p-8">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-4xl mx-auto p-8">
             {/* Back Navigation */}
             <button
-              onClick={() => patientId ? router.push(`/patients/profile/${patientId}`) : router.push('/patients')}
+              onClick={() => patientId ? router.push(`/website/patients/profile/${patientId}`) : router.push('/website/patients')}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
             >
               <ArrowLeft size={20} />
@@ -220,11 +207,7 @@ export default function AddConsultationPage() {
                   value={formData.consultationDate}
                   onChange={handleInputChange}
                   max={new Date().toISOString().split('T')[0]}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                    errors.consultationDate
-                      ? 'border-red-500 focus:ring-red-500 bg-red-50'
-                      : 'border-gray-300 focus:ring-blue-500'
-                  }`}
+                  className={errors.consultationDate ? 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all border-red-500 focus:ring-red-500 bg-red-50' : 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all border-gray-300 focus:ring-blue-500'}
                   required
                 />
                 {errors.consultationDate && (
@@ -293,10 +276,6 @@ export default function AddConsultationPage() {
               </div>
             </form>
           </div>
-        </div>
-        
-        <Footer />
-      </div>
     </div>
   );
 }

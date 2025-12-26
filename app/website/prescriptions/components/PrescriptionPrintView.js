@@ -60,7 +60,7 @@ export default function PrescriptionPrintView({ patient, medications, clinicInfo
             margin: '0 0 8px 0',
             color: 'black'
           }}>
-            {doctorInfo.name || 'Dr Bendounan Djilali'}
+            {doctorInfo.name || 'Dr Bouzourene '}
           </h1>
           
           {/* specialty */}
@@ -70,7 +70,7 @@ export default function PrescriptionPrintView({ patient, medications, clinicInfo
             margin: '0 0 12px 0',
             color: 'black'
           }}>
-            {doctorInfo.specialty || 'Cardiologue'}
+            {doctorInfo.specialty || 'Médecin Généraliste'}
           </p>
           
           {/* city */}
@@ -202,53 +202,9 @@ export default function PrescriptionPrintView({ patient, medications, clinicInfo
           ))}
         </div>
 
-        {/* barcode and number */}
-        <div style={{ 
-          textAlign: 'center',
-          marginTop: '80px',
-          paddingTop: '20px'
-        }}>
-          {/* simple barcode representation */}
-          <div style={{ 
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '2px',
-            marginBottom: '10px',
-            height: '50px',
-            alignItems: 'flex-end'
-          }}>
-            {[3, 1, 3, 2, 1, 3, 1, 2, 3, 1, 3, 2, 1, 3, 1, 2, 3, 1, 3, 2, 1, 3, 1, 2, 3, 1, 3, 2, 1, 3].map((width, i) => (
-              <div key={i} style={{
-                width: `${width}px`,
-                height: '40px',
-                backgroundColor: 'black'
-              }}></div>
-            ))}
+        
+           
           </div>
-          
-          <p style={{ 
-            fontSize: '18px', 
-            fontWeight: 'bold',
-            margin: '10px 0 4px 0',
-            color: 'black'
-          }}>
-            {rxNumber}
-          </p>
-          <p style={{ 
-            fontSize: '10px',
-            margin: '0',
-            color: '#666'
-          }}>
-            https://www.pharmanet-dz.com
-          </p>
-        </div>
-      </div>
-    </>
+        </>
   );
-}
-
-// Helper function to generate prescription number
-function generateRxNumber() {
-  const random = Math.floor(Math.random() * 1000);
-  return `0291-${random.toString().padStart(3, '0')}`;
-}
+} 

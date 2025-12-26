@@ -20,7 +20,7 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
 
-    // Simulate a delay as in mob dev 
+    // Simulate a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Check credentials
