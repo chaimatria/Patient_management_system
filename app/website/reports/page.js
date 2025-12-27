@@ -77,10 +77,10 @@ export default function ReportsPage() {
           isPositive={true}
         />
         <StatsCard
-          title="Avg. Consultations/Day"
-          value={`${reportsData.stats.avgConsultationsPerDay}`}
-          change="-2.1%"
-          isPositive={false}
+          title="Total Prescriptions"
+          value={`${reportsData.stats.totalPrescriptions}`}
+          change="+3 new"
+          isPositive={true}
         />
         <StatsCard
           title="Successful Resolutions"

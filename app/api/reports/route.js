@@ -56,12 +56,9 @@ export async function GET(request) {
       SELECT COUNT(*) as total FROM consultations
     `).get();
 
-    // 6. Average consultations per day (last 30 days)
-    const avgConsultationsPerDay = db.prepare(`
-      SELECT 
-        CAST(COUNT(*) AS FLOAT) / 30.0 as avg
-      FROM consultations
-      WHERE consultation_date >= datetime('now', '-30 days')
+    // 6. Total prescriptions
+    const totalPrescriptions = db.prepare(`
+      SELECT COUNT(*) as total FROM prescriptions
     `).get();
 
     // 7. Success rate (completed appointments / total appointments)
@@ -109,7 +106,7 @@ export async function GET(request) {
     const response = {
       stats: {
         totalConsultations: totalConsultations.total || 0,
-        avgConsultationsPerDay: Math.round(avgConsultationsPerDay?.avg || 0),
+        totalPrescriptions: totalPrescriptions.total || 0,
         successRate: Math.round(successRate?.rate || 0),
         totalPathologies: commonPathologies.length
       },

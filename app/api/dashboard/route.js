@@ -63,10 +63,10 @@ export async function GET(request) {
       WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')
     `).get();
 
-    // 7. Upcoming consultations (follow-ups/pending)
-    const pendingFollowUps = db.prepare(`
-      SELECT COUNT(*) as count FROM consultations
-      WHERE consultation_date > datetime('now')
+    // 7. Recent prescriptions (last 7 days)
+    const recentPrescriptionsCount = db.prepare(`
+      SELECT COUNT(*) as count FROM prescriptions
+      WHERE prescription_date >= datetime('now', '-7 days')
     `).get();
 
     // 8. Recent activity (combined from consultations and prescriptions)
@@ -125,10 +125,10 @@ export async function GET(request) {
         icon: 'CalendarCheck'
       },
       {
-        label: 'Suivis en attente',
-        value: String(pendingFollowUps.count),
-        change: pendingFollowUps.count > 0 ? `${pendingFollowUps.count} follow-ups` : 'All current',
-        changeType: pendingFollowUps.count > 2 ? 'warning' : 'positive',
+        label: 'Ordonnances récentes',
+        value: String(recentPrescriptionsCount.count),
+        change: recentPrescriptionsCount.count > 0 ? `${recentPrescriptionsCount.count} this week` : 'None',
+        changeType: recentPrescriptionsCount.count > 0 ? 'positive' : 'neutral',
         icon: 'FileCheck'
       }
     ];
