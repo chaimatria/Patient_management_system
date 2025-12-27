@@ -4,10 +4,10 @@ export default function CommonPathologies({ data }) {
     return (
       <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-1">Most Common Pathologies</h2>
-          <p className="text-sm text-gray-500">Top conditions diagnosed in consultations.</p>
+          <h2 className="text-lg font-semibold text-gray-800 mb-1">Pathologies les plus courantes</h2>
+          <p className="text-sm text-gray-500">Conditions principales diagnostiquées lors des consultations.</p>
         </div>
-        <p className="text-gray-500 text-center py-8">No pathology data available</p>
+        <p className="text-gray-500 text-center py-8">Aucune donnée de pathologie disponible</p>
       </div>
     );
   }
@@ -15,17 +15,17 @@ export default function CommonPathologies({ data }) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1">Most Common Pathologies</h2>
-        <p className="text-sm text-gray-500">Top conditions diagnosed in consultations.</p>
+        <h2 className="text-lg font-semibold text-gray-800 mb-1">Pathologies les plus courantes</h2>
+        <p className="text-sm text-gray-500">Conditions principales diagnostiquées lors des consultations.</p>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200">
-              <th className="text-left text-sm font-medium text-gray-600 pb-3">Pathology</th>
-              <th className="text-right text-sm font-medium text-gray-600 pb-3">Count</th>
-              <th className="text-right text-sm font-medium text-gray-600 pb-3">Category</th>
+              <th className="text-left text-sm font-medium text-gray-600 pb-3">Pathologie</th>
+              <th className="text-right text-sm font-medium text-gray-600 pb-3">Nombre</th>
+              <th className="text-right text-sm font-medium text-gray-600 pb-3">Catégorie</th>
             </tr>
           </thead>
           <tbody>

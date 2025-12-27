@@ -12,7 +12,7 @@ export default function ConsultationsTrend({ data }) {
   if (!data) {
     return (
       <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-        <p className="text-gray-500">Loading data...</p>
+        <p className="text-gray-500">Chargement des données...</p>
       </div>
     );
   }
@@ -33,13 +33,13 @@ export default function ConsultationsTrend({ data }) {
       // Add title
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(16);
-      pdf.text('Consultations Trend Report', 20, 20);
+      pdf.text('Rapport de Tendance des Consultations', 20, 20);
 
       // Add metadata
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
-      pdf.text(`Period: ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`, 20, 30);
-      pdf.text(`Generated: ${new Date().toLocaleDateString('en-US')}`, 20, 37);
+      pdf.text(`Période: ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`, 20, 30);
+      pdf.text(`Généré: ${new Date().toLocaleDateString('fr-FR')}`, 20, 37);
 
       // Add table header
       pdf.setFont('helvetica', 'bold');
@@ -69,13 +69,13 @@ export default function ConsultationsTrend({ data }) {
       pdf.setFontSize(10);
       yPosition += 10;
       pdf.text(`Total Consultations: ${trendData.reduce((sum, p) => sum + p.count, 0)}`, 30, yPosition);
-      pdf.text(`Average: ${Math.round(trendData.reduce((sum, p) => sum + p.count, 0) / trendData.length)}`, 30, yPosition + 8);
+      pdf.text(`Moyenne: ${Math.round(trendData.reduce((sum, p) => sum + p.count, 0) / trendData.length)}`, 30, yPosition + 8);
 
       // Download PDF
       pdf.save(`consultations-trend-${activeTab}-${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      alert('Failed to export PDF');
+      alert('Échec de l\'export PDF');
     } finally {
       setIsExporting(false);
     }
@@ -120,7 +120,7 @@ export default function ConsultationsTrend({ data }) {
       document.body.removeChild(link);
     } catch (error) {
       console.error('Error exporting CSV:', error);
-      alert('Failed to export CSV');
+      alert('Impossible d\'exporter CSV');
     } finally {
       setIsExporting(false);
     }
@@ -129,8 +129,8 @@ export default function ConsultationsTrend({ data }) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1">Consultations Trend</h2>
-        <p className="text-sm text-gray-500">Number of consultations over time.</p>
+        <h2 className="text-lg font-semibold text-gray-800 mb-1">Tendance des Consultations</h2>
+        <p className="text-sm text-gray-500">Nombre de consultations au fil du temps.</p>
       </div>
 
       {/* Controls */}
@@ -144,7 +144,7 @@ export default function ConsultationsTrend({ data }) {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Daily
+            Quotidien
           </button>
           <button
             onClick={() => setActiveTab('weekly')}
@@ -154,7 +154,7 @@ export default function ConsultationsTrend({ data }) {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Weekly
+            Hebdomadaire
           </button>
           <button
             onClick={() => setActiveTab('monthly')}
@@ -164,7 +164,7 @@ export default function ConsultationsTrend({ data }) {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Monthly
+            Mensuel
           </button>
         </div>
 
@@ -175,7 +175,7 @@ export default function ConsultationsTrend({ data }) {
             className="flex items-center justify-center sm:justify-start gap-2 flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <FileDown className="w-4 h-4" />
-            <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'PDF'}</span>
+            <span className="hidden sm:inline">{isExporting ? 'Export en cours...' : 'PDF'}</span>
           </button>
           <button 
             onClick={exportToCSV}
@@ -183,7 +183,7 @@ export default function ConsultationsTrend({ data }) {
             className="flex items-center justify-center sm:justify-start gap-2 flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'CSV'}</span>
+            <span className="hidden sm:inline">{isExporting ? 'Export en cours...' : 'CSV'}</span>
           </button>
         </div>
       </div>
@@ -289,7 +289,7 @@ export default function ConsultationsTrend({ data }) {
           </svg>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">No data available</p>
+            <p className="text-gray-500">Aucune donnée disponible</p>
           </div>
         )}
       </div>

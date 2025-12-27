@@ -4,10 +4,10 @@ export default function PathologiesByCount({ data }) {
     return (
       <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-1">Pathologies by Count</h2>
-          <p className="text-sm text-gray-500">Visual breakdown of most frequent pathologies.</p>
+          <h2 className="text-lg font-semibold text-gray-800 mb-1">Pathologies par nombre</h2>
+          <p className="text-sm text-gray-500">Répartition visuelle des pathologies les plus fréquentes.</p>
         </div>
-        <p className="text-gray-500 text-center py-8">No pathology data available</p>
+        <p className="text-gray-500 text-center py-8">Aucune donnée de pathologie disponible</p>
       </div>
     );
   }
@@ -17,8 +17,8 @@ export default function PathologiesByCount({ data }) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1">Pathologies by Count</h2>
-        <p className="text-sm text-gray-500">Visual breakdown of most frequent pathologies.</p>
+        <h2 className="text-lg font-semibold text-gray-800 mb-1">Pathologies par nombre</h2>
+        <p className="text-sm text-gray-500">Répartition visuelle des pathologies les plus fréquentes.</p>
       </div>
 
       <div className="space-y-4">

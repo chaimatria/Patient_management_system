@@ -21,7 +21,7 @@ export default function ReportsPage() {
         const response = await fetch('/api/reports');
         
         if (!response.ok) {
-          throw new Error('Failed to fetch reports data');
+          throw new Error('Impossible de récupérer les données de rapports');
         }
         
         const data = await response.json();
@@ -66,26 +66,26 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">Reports</h1>
+      <h1 className="text-3xl font-bold text-gray-800">Rapports</h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatsCard
           title="Total Consultations"
           value={`${reportsData.stats.totalConsultations.toLocaleString()}`}
-          change="+12.5%"
+          change="+12,5%"
           isPositive={true}
         />
         <StatsCard
-          title="Total Prescriptions"
+          title="Total Ordonnances"
           value={`${reportsData.stats.totalPrescriptions}`}
-          change="+3 new"
+          change="+3 nouvelles"
           isPositive={true}
         />
         <StatsCard
-          title="Successful Resolutions"
+          title="Résolutions Réussies"
           value={`${reportsData.stats.successRate}%`}
-          change="+0.8%"
+          change="+0,8%"
           isPositive={true}
         />
       </div>

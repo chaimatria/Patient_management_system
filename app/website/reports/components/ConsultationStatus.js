@@ -3,7 +3,7 @@ export default function ConsultationStatus({ data }) {
   if (!data) {
     return (
       <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-        <p className="text-gray-500">Loading data...</p>
+        <p className="text-gray-500">Chargement des données...</p>
       </div>
     );
   }
@@ -15,8 +15,8 @@ export default function ConsultationStatus({ data }) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1">Consultation Status</h2>
-        <p className="text-sm text-gray-500">Distribution of consultation outcomes.</p>
+        <h2 className="text-lg font-semibold text-gray-800 mb-1">Statut de la Consultation</h2>
+        <p className="text-sm text-gray-500">Distribution des résultats de consultation.</p>
       </div>
 
       {/* Donut Chart */}
@@ -69,21 +69,21 @@ export default function ConsultationStatus({ data }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Completed</span>
+            <span className="text-sm text-gray-600">Terminé</span>
           </div>
           <span className="text-sm font-medium text-gray-800">{data.completed.count} ({data.completed.percentage}%)</span>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Pending</span>
+            <span className="text-sm text-gray-600">En attente</span>
           </div>
           <span className="text-sm font-medium text-gray-800">{data.pending.count} ({data.pending.percentage}%)</span>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-gray-800 rounded-full"></div>
-            <span className="text-sm text-gray-600">Cancelled</span>
+            <span className="text-sm text-gray-600">Annélé</span>
           </div>
           <span className="text-sm font-medium text-gray-800">{data.cancelled.count} ({data.cancelled.percentage}%)</span>
         </div>
