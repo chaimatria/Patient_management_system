@@ -118,7 +118,7 @@ export async function GET(request) {
         icon: 'Users'
       },
       {
-        label: 'Consultations à venir',
+        label: 'Rendez-vous a venir',
         value: String(upcomingAppointments.length),
         change: upcomingAppointments.length > 0 ? 'Upcoming' : 'None',
         changeType: upcomingAppointments.length > 0 ? 'positive' : 'neutral',

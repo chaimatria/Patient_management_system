@@ -113,7 +113,7 @@ export default function DashboardPage() {
             ))}
           </div>
           <button 
-            onClick={() => router.push('/website/appoitments')}
+            onClick={() => router.push('/website/appointments')}
             className="w-full mt-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
           >
             Voir tous les rendez-vous
@@ -131,18 +131,11 @@ export default function DashboardPage() {
               <span className="font-medium">Ajouter un patient</span>
             </button>
             <button 
-              onClick={() => router.push('/website/appoitments')}
+              onClick={() => router.push('/website/appointments')}
               className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
             >
               <CalendarCheck className="w-5 h-5" />
               <span className="font-medium">Programmer un rendez-vous</span>
-            </button>
-            <button 
-              onClick={() => router.push('/website/notes')}
-              className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors"
-            >
-              <FileText className="w-5 h-5" />
-              <span className="font-medium">Voir les notes récentes</span>
             </button>
           </div>
         </section>
