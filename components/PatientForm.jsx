@@ -406,7 +406,7 @@ case 'phoneNumber':
     <div className="max-w-5xl mx-auto p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">
-          {patientData ? 'Edit Patient' : 'Add New Patient'}
+          {patientData ? 'Modifier le patient' : 'Ajouter un nouveau patient'}
         </h1>
           <button
           onClick={generatePatientId}
@@ -414,19 +414,19 @@ case 'phoneNumber':
           disabled={isLoading}
           className="px-4 py-2 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Generate Patient ID
+          Générer l'ID du patient
         </button>
       </div>
 
       {/* Patient Information */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Patient Information</h2>
-        <p className="text-sm text-gray-500 mb-6">Fill in the details to add a new patient record.</p>
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">Informations du patient</h2>
+        <p className="text-sm text-gray-500 mb-6">Remplissez les détails pour ajouter un nouveau dossier patient.</p>
 
         <div className="grid grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name <span className="text-red-500">*</span>
+              Nom complet <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -437,7 +437,7 @@ case 'phoneNumber':
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 className={getInputClassName('fullName')}
-                placeholder="Enter full name"
+                placeholder="Entrez le nom complet"
                 required
                 maxLength={100}
               />
@@ -454,14 +454,14 @@ case 'phoneNumber':
             {validFields.fullName && touched.fullName && !errors.fullName && (
               <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                 <CheckCircle size={12} />
-                Looks good!
+                Ça a l'air bien !
               </p>
             )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Date of Birth <span className="text-red-500">*</span>
+              Date de naissance <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -486,13 +486,13 @@ case 'phoneNumber':
             ) : formData.dateOfBirth && !errors.dateOfBirth ? (
               <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                 <CheckCircle size={12} />
-                Age: {calculateAge(formData.dateOfBirth)} years
+                Âge : {calculateAge(formData.dateOfBirth)} ans
               </p>
             ) : null}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Genre</label>
             <div className="flex gap-6">
               <label className="flex items-center cursor-pointer">
                 <input
@@ -503,7 +503,7 @@ case 'phoneNumber':
                   onChange={() => handleGenderChange('male')}
                   className="w-4 h-4 text-blue-500 focus:ring-blue-500"
                 />
-                <span className="ml-2 text-sm text-gray-700">Male</span>
+                <span className="ml-2 text-sm text-gray-700">Homme</span>
               </label>
               <label className="flex items-center cursor-pointer">
                 <input
@@ -514,14 +514,14 @@ case 'phoneNumber':
                   onChange={() => handleGenderChange('female')}
                   className="w-4 h-4 text-blue-500 focus:ring-blue-500"
                 />
-                <span className="ml-2 text-sm text-gray-700">Female</span>
+                <span className="ml-2 text-sm text-gray-700">Femme</span>
               </label>
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Patient ID <span className="text-red-500">*</span>
+              ID du patient <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -548,14 +548,14 @@ case 'phoneNumber':
             {validFields.patientId && touched.patientId && !errors.patientId && (
               <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                 <CheckCircle size={12} />
-                Valid Patient ID
+                ID du patient valide
               </p>
             )}
           </div>
 
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number
+              Numéro de téléphone
             </label>
             <div className="relative">
               <input
@@ -565,7 +565,7 @@ case 'phoneNumber':
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 className={getInputClassName('phoneNumber')}
-                placeholder="06 1234 5678 or +212 6 12 34 56 78"
+                placeholder="06 1234 5678 ou +212 6 12 34 56 78"
                 maxLength={10}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -581,7 +581,7 @@ case 'phoneNumber':
             {validFields.phoneNumber && touched.phoneNumber && !errors.phoneNumber && (
               <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                 <CheckCircle size={12} />
-                Valid phone number
+                Numéro de téléphone valide
               </p>
             )}
           </div>
@@ -590,11 +590,11 @@ case 'phoneNumber':
 
       {/* Medical History */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Medical History</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">Antécédents médicaux</h2>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Pathology (Medical History)
+            Pathologie (Antécédents médicaux)
           </label>
           <textarea
             name="pathology"
@@ -602,17 +602,17 @@ case 'phoneNumber':
             onChange={handleInputChange}
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Enter medical conditions, diagnoses, etc."
+            placeholder="Entrez les conditions médicales, les diagnostics, etc."
             maxLength={1000}
           />
           <p className="text-xs text-gray-500 mt-1">
-            {formData.pathology.length}/1000 characters
+            {formData.pathology.length}/1000 caractères
           </p>
         </div>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Family Members with Same Disease
+            Membres de la famille atteints de la même maladie
           </label>
           <textarea
             name="familyHistory"
@@ -620,11 +620,11 @@ case 'phoneNumber':
             onChange={handleInputChange}
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Enter family medical history"
+            placeholder="Entrez l'historique médical familial"
             maxLength={1000}
           />
           <p className="text-xs text-gray-500 mt-1">
-            {formData.familyHistory.length}/1000 characters
+            {formData.familyHistory.length}/1000 caractères
           </p>
         </div>
 
@@ -638,22 +638,22 @@ case 'phoneNumber':
             onChange={handleInputChange}
             rows="2"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Enter known allergies"
+            placeholder="Entrez les allergies connues"
             maxLength={500}
           />
           <p className="text-xs text-gray-500 mt-1">
-            {formData.allergies.length}/500 characters
+            {formData.allergies.length}/500 caractères
           </p>
         </div>
       </div>
 
       {/* Treatment Details */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Treatment Details</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">Détails du traitement</h2>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Previous Treatments
+            Traitements précédents
           </label>
           <textarea
             name="previousTreatments"
@@ -661,17 +661,17 @@ case 'phoneNumber':
             onChange={handleInputChange}
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Enter previous treatments and medications"
+            placeholder="Entrez les traitements et les médicaments précédents"
             maxLength={1000}
           />
           <p className="text-xs text-gray-500 mt-1">
-            {formData.previousTreatments.length}/1000 characters
+            {formData.previousTreatments.length}/1000 caractères
           </p>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Current Treatment
+            Traitement actuel
           </label>
           <textarea
             name="currentTreatment"
@@ -679,29 +679,29 @@ case 'phoneNumber':
             onChange={handleInputChange}
             rows="3"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Enter current treatments and medications"
+            placeholder="Entrez les traitements et les médicaments actuels"
             maxLength={1000}
           />
           <p className="text-xs text-gray-500 mt-1">
-            {formData.currentTreatment.length}/1000 characters
+            {formData.currentTreatment.length}/1000 caractères
           </p>
         </div>
       </div>
 
       {/* Additional Notes */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Additional Notes</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">Remarques supplémentaires</h2>
         <textarea
           name="notes"
           value={formData.notes}
           onChange={handleInputChange}
           rows="4"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-          placeholder="Enter any additional notes or observations"
+          placeholder="Entrez les remarques ou observations supplémentaires"
           maxLength={2000}
         />
         <p className="text-xs text-gray-500 mt-1">
-          {formData.notes.length}/2000 characters
+          {formData.notes.length}/2000 caractères
         </p>
       </div>
 
@@ -713,7 +713,7 @@ case 'phoneNumber':
           disabled={isLoading}
           className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Cancel
+          Annuler
         </button>
         <button
           type="button"
@@ -724,10 +724,10 @@ case 'phoneNumber':
           {isLoading ? (
             <>
               <span className="animate-spin">⏳</span>
-              Saving...
+              Enregistrement...
             </>
           ) : (
-            patientData ? 'Update Patient' : 'Save Patient'
+            patientData ? 'Modifier le patient' : 'Enregistrer le patient'
           )}
         </button>
       </div>

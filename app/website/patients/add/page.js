@@ -46,7 +46,7 @@ export default function AddPatientPage() {
       setPatientData(data);
     } catch (error) {
       console.error('Error loading patient:', error);
-      alert('Error loading patient data');
+      alert('Erreur lors du chargement des données du patient');
     } finally {
       setIsLoading(false);
     }
@@ -74,13 +74,13 @@ export default function AddPatientPage() {
         if (!response.ok) throw new Error('Failed to create patient');
       }
 
-      alert('Patient saved successfully!');
+      alert('Patient enregistré avec succès!');
 
       router.push('/website/patients');
       // After saving, go back to the patients list
     } catch (error) {
       console.error('Error saving patient:', error);
-      alert('Error saving patient: ' + (error.message || 'Unknown error'));
+      alert('Erreur lors de l\'enregistrement du patient: ' + (error.message || 'Erreur inconnue'));
       throw error; // If something goes wrong
     }
   };
@@ -88,7 +88,7 @@ export default function AddPatientPage() {
   const handleCancel = () => {
     // This runs when the user clicks "Cancel"
 
-    if (window.confirm('Discard changes?')) {
+    if (window.confirm('Abandonner les modifications?')) {
       router.push('/website/patients'); 
       // If user confirms → go back to patients list
     }
@@ -98,7 +98,7 @@ export default function AddPatientPage() {
     <div className="max-w-7xl mx-auto p-8">
       {isLoading ? (
         <div className="flex items-center justify-center h-48">
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-gray-500">Chargement...</p>
         </div>
       ) : (
         <PatientForm

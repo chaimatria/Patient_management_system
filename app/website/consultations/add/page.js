@@ -40,7 +40,7 @@ export default function AddConsultationPage() {
       setPatient(patientData);
     } catch (error) {
       console.error('Error loading patient:', error);
-      alert('Error loading patient data');
+      alert('Erreur lors du chargement des données du patient');
       router.push('/website/patients');
     } finally {
       setIsLoadingPatient(false);
@@ -63,7 +63,7 @@ export default function AddConsultationPage() {
       }
     } catch (error) {
       console.error('Error loading consultation:', error);
-      alert('Error loading consultation data');
+      alert('Erreur lors du chargement des données de la consultation');
     }
   };
 
@@ -85,7 +85,7 @@ export default function AddConsultationPage() {
     const newErrors = {};
     
     if (!formData.consultationDate) {
-      newErrors.consultationDate = 'Consultation date is required';
+      newErrors.consultationDate = 'La date de consultation est obligatoire';
     }
     
     setErrors(newErrors);
@@ -128,7 +128,7 @@ export default function AddConsultationPage() {
         throw new Error(errorData.error || 'Failed to save consultation');
       }
 
-      alert(consultationId ? 'Consultation updated successfully!' : 'Consultation created successfully!');
+      alert(consultationId ? 'Consultation mise à jour avec succès!' : 'Consultation créée avec succès!');
       
       // Navigate back to patient profile (use website routes)
       if (patientId) {
@@ -138,14 +138,14 @@ export default function AddConsultationPage() {
       }
     } catch (error) {
       console.error('Error saving consultation:', error);
-      alert('Error saving consultation: ' + error.message);
+      alert('Erreur lors de l\'enregistrement de la consultation: ' + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    if (window.confirm('Discard changes?')) {
+    if (window.confirm('Abandonner les modifications?')) {
       if (patientId) {
         router.push(`/website/patients/profile/${patientId}`);
       } else {
@@ -158,7 +158,7 @@ export default function AddConsultationPage() {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">Loading patient data...</p>
+          <p className="text-gray-500">Chargement des données du patient...</p>
         </div>
       </div>
     );
@@ -174,14 +174,14 @@ export default function AddConsultationPage() {
             >
               <ArrowLeft size={20} />
               <span className="font-medium">
-                {patientId ? 'Back to Patient Profile' : 'Back to Patients List'}
+                {patientId ? 'Retour au profil du patient' : 'Retour à la liste des patients'}
               </span>
             </button>
 
             {/* Header */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
               <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-                {consultationId ? 'Edit Consultation' : 'Add New Consultation'}
+                {consultationId ? 'Modifier la consultation' : 'Ajouter une nouvelle consultation'}
               </h1>
               {patient && (
                 <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -199,7 +199,7 @@ export default function AddConsultationPage() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Calendar size={16} className="inline mr-2" />
-                  Consultation Date <span className="text-red-500">*</span>
+                  Date de consultation <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -219,7 +219,7 @@ export default function AddConsultationPage() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Calendar size={16} className="inline mr-2" />
-                  Last Visit Date
+                  Date de dernière visite
                 </label>
                 <input
                   type="date"
@@ -230,7 +230,7 @@ export default function AddConsultationPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Leave empty to use consultation date
+                  Laisser vide pour utiliser la date de consultation
                 </p>
               </div>
 
@@ -238,7 +238,7 @@ export default function AddConsultationPage() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <FileText size={16} className="inline mr-2" />
-                  Consultation Notes / Description
+                  Notes / Description de la consultation
                 </label>
                 <textarea
                   name="description"
@@ -246,11 +246,11 @@ export default function AddConsultationPage() {
                   onChange={handleInputChange}
                   rows="8"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  placeholder="Enter consultation notes, diagnosis, observations, recommendations, etc."
+                  placeholder="Entrez les notes de consultation, diagnostic, observations, recommandations, etc."
                   maxLength={5000}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  {formData.description.length}/5000 characters
+                  {formData.description.length}/5000 caractères
                 </p>
               </div>
 
@@ -263,7 +263,7 @@ export default function AddConsultationPage() {
                   className="flex items-center gap-2 px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <X size={18} />
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   type="submit"
@@ -271,7 +271,7 @@ export default function AddConsultationPage() {
                   className="flex items-center gap-2 px-6 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save size={18} />
-                  {isLoading ? 'Saving...' : (consultationId ? 'Update Consultation' : 'Save Consultation')}
+                  {isLoading ? 'Enregistrement...' : (consultationId ? 'Mettre à jour la consultation' : 'Enregistrer la consultation')}
                 </button>
               </div>
             </form>

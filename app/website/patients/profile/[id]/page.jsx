@@ -72,12 +72,12 @@ export default function PatientProfilePage() {
       if (foundPatient) {
         setPatient(foundPatient);
       } else {
-        alert('Patient not found');
+        alert('Patient non trouvé');
         router.push('/website/patients');
       }
     } catch (error) {
         console.error('Error loading patient:', error);
-      alert('Error loading patient data');
+      alert('Erreur lors du chargement des données du patient');
       router.push('/website/patients');
     } finally {
       setIsLoading(false);
@@ -149,7 +149,7 @@ export default function PatientProfilePage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this patient? This action cannot be undone.')) {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce patient? Cette action ne peut pas être annulée.')) {
       return;
     }
 
@@ -162,11 +162,11 @@ export default function PatientProfilePage() {
 
       if (!response.ok) throw new Error('Failed to delete patient');
       
-      alert('Patient deleted successfully');
+      alert('Patient supprimé avec succès');
       router.push('/website/patients');
     } catch (error) {
       console.error('Error deleting patient:', error);
-      alert('Error deleting patient');
+      alert('Erreur lors de la suppression du patient');
     }
   };
 
@@ -183,7 +183,7 @@ export default function PatientProfilePage() {
   };
 
   const handleDeleteConsultation = async (consultationId) => {
-    if (!window.confirm('Are you sure you want to delete this consultation?')) {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette consultation?')) {
       return;
     }
 
@@ -196,20 +196,20 @@ export default function PatientProfilePage() {
 
       if (!response.ok) throw new Error('Failed to delete consultation');
       
-      alert('Consultation deleted successfully');
+      alert('Consultation supprimée avec succès');
       // Reload consultations
       await loadConsultations(patientId);
       // Also refresh patient data to reflect any changes in last visit
       await loadPatientData(patientId);
     } catch (error) {
       console.error('Error deleting consultation:', error);
-      alert('Error deleting consultation');
+      alert('Erreur lors de la suppression de la consultation');
     }
   };
 
   // Mark a consultation as the patient's last visit (updates consultation.last_visit and patient.consultation_date)
   const handleMarkAsLastVisit = async (consultationId, consultationDate) => {
-    if (!window.confirm('Set this consultation as the last visit for the patient?')) return;
+    if (!window.confirm('Définir cette consultation comme dernière visite du patient?')) return;
     try {
       const response = await fetch('/api/consultations', {
         method: 'PUT',
@@ -226,12 +226,12 @@ export default function PatientProfilePage() {
         throw new Error(data.error || 'Failed to set last visit');
       }
 
-      alert('Last visit updated');
+      alert('Dernière visite mise à jour');
       await loadConsultations(patientId);
       await loadPatientData(patientId);
     } catch (error) {
       console.error('Error setting last visit:', error);
-      alert('Error setting last visit: ' + error.message);
+      alert('Erreur lors de la mise à jour de la dernière visite: ' + error.message);
     }
   };
 
@@ -243,7 +243,7 @@ export default function PatientProfilePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-gray-500">Loading patient data...</p>
+        <p className="text-gray-500">Chargement des données du patient...</p>
       </div>
     );
   }
@@ -253,11 +253,11 @@ export default function PatientProfilePage() {
   }
 
   const tabs = [
-    { id: 'personal', label: 'Personal Info', icon: User },
-    { id: 'pathology', label: 'Pathology & Family History', icon: Stethoscope },
-    { id: 'consultation', label: 'Consultation History', icon: FileText },
-    { id: 'treatment', label: 'Treatment Plans', icon: Pill },
-    { id: 'notes', label: 'Notes', icon: AlertCircle },
+    { id: 'personal', label: 'Infos personnelles', icon: User },
+    { id: 'pathology', label: 'Pathologie et antécédents familiaux', icon: Stethoscope },
+    { id: 'consultation', label: 'Historique des consultations', icon: FileText },
+    { id: 'treatment', label: 'Plans de traitement', icon: Pill },
+    { id: 'notes', label: 'Remarques', icon: AlertCircle },
   ];
 
   return (
@@ -268,7 +268,7 @@ export default function PatientProfilePage() {
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
             >
               <ArrowLeft size={20} />
-              <span className="font-medium">Back to Patients</span>
+              <span className="font-medium">Retour aux patients</span>
             </button>
 
             {/* Patient Header Card */}
@@ -318,26 +318,26 @@ export default function PatientProfilePage() {
                     className="flex items-center gap-2 px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
                   >
                     <Plus size={18} />
-                    Add Consultation
+                    Ajouter une consultation
                   </button>
                   <button
                     onClick={handleCreatePrescription}
                     className="flex items-center gap-2 px-4 py-2.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
                   >
                     <Pill size={18} />
-                    Create Prescription
+                    Créer une ordonnance
                   </button>
                   <button
                     onClick={handleEdit}
                     className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                    title="Edit Patient"
+                    title="Modifier le patient"
                   >
                     <Edit size={20} className="text-gray-600" />
                   </button>
                   <button
                     onClick={handleDelete}
                     className="p-2.5 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
-                    title="Delete Patient"
+                    title="Supprimer le patient"
                   >
                     <Trash2 size={20} className="text-red-600" />
                   </button>
@@ -349,7 +349,7 @@ export default function PatientProfilePage() {
                 <div className="bg-blue-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 text-blue-600 mb-1">
                     <Clock size={18} />
-                    <span className="text-sm font-medium">Last Visit</span>
+                    <span className="text-sm font-medium">Dernière visite</span>
                   </div>
                   <p className="text-lg font-semibold text-gray-900">
                     {formatDate(patient.lastVisit)}
@@ -359,7 +359,7 @@ export default function PatientProfilePage() {
                 <div className="bg-green-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 text-green-600 mb-1">
                     <FileText size={18} />
-                    <span className="text-sm font-medium">Total Consultations</span>
+                    <span className="text-sm font-medium">Total des consultations</span>
                   </div>
                   <p className="text-lg font-semibold text-gray-900">{consultations.length}</p>
                 </div>
@@ -399,13 +399,13 @@ export default function PatientProfilePage() {
                 {activeTab === 'personal' && (
                   <div className="space-y-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                      Personal Information
+                      Informations personnelles
                     </h2>
                     
                     <div className="grid grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Full Name
+                          Nom complet
                         </label>
                         <p className="text-base text-gray-900 font-medium">
                           {patient.fullName}
@@ -414,7 +414,7 @@ export default function PatientProfilePage() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Date of Birth
+                          Date de naissance
                         </label>
                         <p className="text-base text-gray-900">
                           {formatDate(patient.dateOfBirth)}
@@ -423,16 +423,16 @@ export default function PatientProfilePage() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Age
+                          Âge
                         </label>
                         <p className="text-base text-gray-900">
-                          {calculateAge(patient.dateOfBirth)} years
+                          {calculateAge(patient.dateOfBirth)} ans
                         </p>
                       </div>
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Gender
+                          Genre
                         </label>
                         <p className="text-base text-gray-900 capitalize">
                           {patient.gender}
@@ -441,7 +441,7 @@ export default function PatientProfilePage() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Patient ID
+                          Identifiant du patient
                         </label>
                         <p className="text-base text-blue-600 font-medium">
                           {patient.patientId}
@@ -450,10 +450,10 @@ export default function PatientProfilePage() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Phone Number
+                          Numéro de téléphone
                         </label>
                         <p className="text-base text-gray-900">
-                          {patient.phoneNumber || 'Not provided'}
+                          {patient.phoneNumber || 'Non fourni'}
                         </p>
                       </div>
                     </div>
@@ -464,17 +464,17 @@ export default function PatientProfilePage() {
                 {activeTab === 'pathology' && (
                   <div className="space-y-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                      Pathology & Family History
+                      Pathologie et antécédents familiaux
                     </h2>
                     
                     {/* Pathology */}
                     <div>
                       <label className="block text-sm font-medium text-gray-500 mb-2">
-                        Pathology (Medical History)
+                        Pathologie (Historique médical)
                       </label>
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <p className="text-gray-900 whitespace-pre-wrap">
-                          {patient.pathology || 'No pathology information recorded.'}
+                          {patient.pathology || 'Aucune information de pathologie enregistrée.'}
                         </p>
                       </div>
                     </div>
@@ -482,11 +482,11 @@ export default function PatientProfilePage() {
                     {/* Family History */}
                     <div>
                       <label className="block text-sm font-medium text-gray-500 mb-2">
-                        Family Members with Same Disease
+                        Membres de la famille atteints de la même maladie
                       </label>
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <p className="text-gray-900 whitespace-pre-wrap">
-                          {patient.familyHistory || 'No family history recorded.'}
+                          {patient.familyHistory || 'Aucun antécédent familial enregistré.'}
                         </p>
                       </div>
                     </div>
@@ -505,12 +505,12 @@ export default function PatientProfilePage() {
                           <div className="flex items-start gap-2 mb-2">
                             <AlertCircle size={18} className="text-red-600 mt-0.5" />
                             <p className="text-sm font-medium text-red-600">
-                              Patient has known allergies
+                              Le patient a des allergies connues
                             </p>
                           </div>
                         )}
                         <p className="text-gray-900 whitespace-pre-wrap">
-                          {patient.allergies || 'No known allergies.'}
+                          {patient.allergies || 'Aucune allergie connue.'}
                         </p>
                       </div>
                     </div>
@@ -522,7 +522,7 @@ export default function PatientProfilePage() {
                   <div>
                     <div className="flex justify-between items-center mb-6">
                       <h2 className="text-xl font-semibold text-gray-900">
-                        Consultation History
+                        Historique des consultations
                         {consultations.length > 0 && (
                           <span className="ml-2 text-sm font-normal text-gray-500">
                             ({consultations.length} {consultations.length === 1 ? 'consultation' : 'consultations'})
@@ -534,28 +534,28 @@ export default function PatientProfilePage() {
                         className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                       >
                         <Plus size={18} />
-                        Add Consultation
+                        Ajouter une consultation
                       </button>
                     </div>
                     
                     {isLoadingConsultations ? (
                       <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                        <p className="text-gray-500">Loading consultations...</p>
+                        <p className="text-gray-500">Chargement des consultations...</p>
                       </div>
                     ) : consultations.length === 0 ? (
                       <div className="bg-gray-50 rounded-lg p-12 text-center border border-gray-200">
                         <FileText className="mx-auto text-gray-400 mb-4" size={48} />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          No consultations yet
+                          Aucune consultation pour le moment
                         </h3>
                         <p className="text-gray-500 mb-6">
-                          Start documenting patient consultations to track their medical journey
+                          Commencez à documenter les consultations des patients pour suivre leur parcours médical
                         </p>
                         <button
                           onClick={handleAddConsultation}
                           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                         >
-                          Add First Consultation
+                          Ajouter la première consultation
                         </button>
                       </div>
                     ) : (
@@ -588,21 +588,21 @@ export default function PatientProfilePage() {
                                 <button
                                   onClick={() => handleMarkAsLastVisit(consultation.consultation_id, consultation.consultation_date)}
                                   className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-                                  title="Mark as Last Visit"
+                                  title="Marquer comme dernière visite"
                                 >
                                   <Clock size={18} />
                                 </button>
                                 <button
                                   onClick={() => handleEditConsultation(consultation.consultation_id)}
                                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                  title="Edit Consultation"
+                                  title="Modifier la consultation"
                                 >
                                   <Edit size={18} />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteConsultation(consultation.consultation_id)}
                                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                  title="Delete Consultation"
+                                  title="Supprimer la consultation"
                                 >
                                   <Trash2 size={18} />
                                 </button>
@@ -616,13 +616,13 @@ export default function PatientProfilePage() {
                                 </p>
                               </div>
                             ) : (
-                              <p className="text-sm text-gray-400 italic">No description provided</p>
+                              <p className="text-sm text-gray-400 italic">Aucune description fournie</p>
                             )}
                             
                             <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500">
-                              Created: {formatDateTime(consultation.created_at)}
+                              Créé le: {formatDateTime(consultation.created_at)}
                               {consultation.updated_at && consultation.updated_at !== consultation.created_at && (
-                                <span className="ml-4">Updated: {formatDateTime(consultation.updated_at)}</span>
+                                <span className="ml-4">Mis à jour: {formatDateTime(consultation.updated_at)}</span>
                               )}
                             </div>
                           </div>
@@ -637,25 +637,25 @@ export default function PatientProfilePage() {
                   <div className="space-y-6">
                     <div className="flex justify-between items-center mb-6">
                       <h2 className="text-xl font-semibold text-gray-900">
-                        Treatment Plans
+                        Plans de traitement
                       </h2>
                       <button
                         onClick={handleCreatePrescription}
                         className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                       >
                         <Pill size={18} />
-                        Create Prescription
+                        Créer une ordonnance
                       </button>
                     </div>
                     
                     {/* Previous Treatments */}
                     <div>
                       <label className="block text-sm font-medium text-gray-500 mb-2">
-                        Previous Treatments
+                        Traitements antérieurs
                       </label>
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <p className="text-gray-900 whitespace-pre-wrap">
-                          {patient.previousTreatments || 'No previous treatments recorded.'}
+                          {patient.previousTreatments || 'Aucun traitement antérieur enregistré.'}
                         </p>
                       </div>
                     </div>
@@ -663,7 +663,7 @@ export default function PatientProfilePage() {
                     {/* Current Treatment */}
                     <div>
                       <label className="block text-sm font-medium text-gray-500 mb-2">
-                        Current Treatment
+                        Traitement actuel
                       </label>
                       <div className={`rounded-lg p-4 border ${
                         patient.currentTreatment 
@@ -674,12 +674,12 @@ export default function PatientProfilePage() {
                           <div className="flex items-start gap-2 mb-2">
                             <Pill size={18} className="text-green-600 mt-0.5" />
                             <p className="text-sm font-medium text-green-600">
-                              Active Treatment Plan
+                              Plan de traitement actif
                             </p>
                           </div>
                         )}
                         <p className="text-gray-900 whitespace-pre-wrap">
-                          {patient.currentTreatment || 'No active treatment plan.'}
+                          {patient.currentTreatment || 'Aucun plan de traitement actif.'}
                         </p>
                       </div>
                     </div>
@@ -690,12 +690,12 @@ export default function PatientProfilePage() {
                 {activeTab === 'notes' && (
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                      Additional Notes
+                      Remarques supplémentaires
                     </h2>
                     
                     <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 min-h-[300px]">
                       <p className="text-gray-900 whitespace-pre-wrap">
-                        {patient.notes || 'No additional notes recorded.'}
+                        {patient.notes || 'Aucune remarque supplémentaire enregistrée.'}
                       </p>
                     </div>
                   </div>

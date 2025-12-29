@@ -83,7 +83,7 @@ export default function ConsultationStatus({ data }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-gray-800 rounded-full"></div>
-            <span className="text-sm text-gray-600">Annélé</span>
+            <span className="text-sm text-gray-600">Annulé</span>
           </div>
           <span className="text-sm font-medium text-gray-800">{data.cancelled.count} ({data.cancelled.percentage}%)</span>
         </div>
