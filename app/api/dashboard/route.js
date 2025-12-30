@@ -113,21 +113,21 @@ export async function GET(request) {
       {
         label: 'Total Patients',
         value: String(totalPatients),
-        change: `${newPatientsThisMonth.count} new this month`,
+        change: `${newPatientsThisMonth.count} nouveau(x) ce mois`,
         changeType: newPatientsThisMonth.count > 0 ? 'positive' : 'neutral',
         icon: 'Users'
       },
       {
         label: 'Rendez-vous a venir',
         value: String(upcomingAppointments.length),
-        change: upcomingAppointments.length > 0 ? 'Upcoming' : 'None',
+        change: upcomingAppointments.length > 0 ? 'À venir' : 'Aucun',
         changeType: upcomingAppointments.length > 0 ? 'positive' : 'neutral',
         icon: 'CalendarCheck'
       },
       {
         label: 'Ordonnances récentes',
         value: String(recentPrescriptionsCount.count),
-        change: recentPrescriptionsCount.count > 0 ? `${recentPrescriptionsCount.count} this week` : 'None',
+        change: recentPrescriptionsCount.count > 0 ? `${recentPrescriptionsCount.count} cette semaine` : 'Aucun',
         changeType: recentPrescriptionsCount.count > 0 ? 'positive' : 'neutral',
         icon: 'FileCheck'
       }

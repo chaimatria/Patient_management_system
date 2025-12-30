@@ -290,9 +290,11 @@ export default function PatientProfilePage() {
                         <strong className="text-blue-600">ID:</strong> {patient.patientId}
                       </span>
                       <span>•</span>
-                      <span className="capitalize">{patient.gender}</span>
+                      <span className="capitalize">
+                        {patient.gender === 'male' ? 'Homme' : patient.gender === 'female' ? 'Femme' : patient.gender}
+                      </span>
                       <span>•</span>
-                      <span>{calculateAge(patient.dateOfBirth)} years old</span>
+                      <span>{calculateAge(patient.dateOfBirth)} ans</span>
                     </div>
                     
                     {/* Contact Info */}
@@ -305,7 +307,7 @@ export default function PatientProfilePage() {
                       )}
                       <div className="flex items-center gap-2">
                         <Calendar size={16} className="text-blue-500" />
-                        <span>DOB: {formatDate(patient.dateOfBirth)}</span>
+                        <span>DDN: {formatDate(patient.dateOfBirth)}</span>
                       </div>
                     </div>
                   </div>
@@ -580,7 +582,7 @@ export default function PatientProfilePage() {
                                 </div>
                                 {consultation.last_visit && (
                                   <p className="text-sm text-gray-500 ml-7">
-                                    Last Visit: {formatDate(consultation.last_visit)}
+                                    Dernière visite: {formatDate(consultation.last_visit)}
                                   </p>
                                 )}
                               </div>
@@ -622,7 +624,7 @@ export default function PatientProfilePage() {
                             <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500">
                               Créé le: {formatDateTime(consultation.created_at)}
                               {consultation.updated_at && consultation.updated_at !== consultation.created_at && (
-                                <span className="ml-4">Mis à jour: {formatDateTime(consultation.updated_at)}</span>
+                                <span className="ml-4">Dernière modification: {formatDateTime(consultation.updated_at)}</span>
                               )}
                             </div>
                           </div>
