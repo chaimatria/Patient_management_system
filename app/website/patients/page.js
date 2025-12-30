@@ -53,19 +53,24 @@ export default function PatientsPage() {
   const handleEditPatient = (patientId) => {
     router.push(`/website/patients/add?id=${patientId}`);
   };
-// f*delete functionality not in this sprint ( REMEMBER IN SPRINT TWO ) 
-//************************************************************************ */
   const handleDeletePatient = async (patientId) => {
     if (!window.confirm('Are you sure you want to delete this patient?')) {
       return;
     }
 
     try {
-      // DATABASE: Delete patient
-      // await window.electron.ipcRenderer.invoke('delete-patient', patientId);
+      // Delete patient from database via API
+      const response = await fetch(`/api/patients?id=${patientId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete patient');
+      }
       
-      // Refresh list
-      loadPatients();
+      // Refresh list after successful deletion
+      await loadPatients();
       alert('Patient deleted successfully');
     } catch (error) {
       console.error('Error deleting patient:', error);
