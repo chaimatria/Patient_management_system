@@ -53,8 +53,6 @@ export default function PatientsPage() {
   const handleEditPatient = (patientId) => {
     router.push(`/website/patients/add?id=${patientId}`);
   };
-// f*delete functionality not in this sprint ( REMEMBER IN SPRINT TWO ) 
-//************************************************************************ */
   const handleDeletePatient = async (patientId) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce patient?')) {
       return;
