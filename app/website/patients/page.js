@@ -59,22 +59,22 @@ export default function PatientsPage() {
     }
 
     try {
-      // Delete patient from database via API
-      const response = await fetch(`/api/patients?id=${patientId}`, {
-        method: 'DELETE',
+      // Call REST API to delete patient (supports query param or JSON body)
+      const response = await fetch(`/api/patients?id=${encodeURIComponent(patientId)}`, {
+        method: 'DELETE'
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to delete patient');
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete patient');
       }
-      
-      // Refresh list after successful deletion
+
+      // Refresh list
       await loadPatients();
       alert('Patient deleted successfully');
     } catch (error) {
       console.error('Error deleting patient:', error);
-      alert('Error deleting patient: ' + error.message);
+      alert('Error deleting patient: ' + (error.message || 'Unknown error'));
     }
   };
 
