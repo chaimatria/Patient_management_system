@@ -25,7 +25,7 @@ export default function PatientsPage() {
       setSelectedPatient(data);
     } catch (error) {
       console.error('Error loading patient:', error);
-      alert('Error loading patient: ' + (error.message || 'Unknown error'));
+      alert('Erreur lors du chargement du patient: ' + (error.message || 'Erreur inconnue'));
     }
   };
 
@@ -40,7 +40,7 @@ export default function PatientsPage() {
       setPatients(formatted);
     } catch (error) {
       console.error('Error loading patients:', error);
-      alert('Error loading patients: ' + error.message);
+      alert('Erreur lors du chargement des patients: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +56,7 @@ export default function PatientsPage() {
 // f*delete functionality not in this sprint ( REMEMBER IN SPRINT TWO ) 
 //************************************************************************ */
   const handleDeletePatient = async (patientId) => {
-    if (!window.confirm('Are you sure you want to delete this patient?')) {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce patient?')) {
       return;
     }
 
@@ -73,10 +73,10 @@ export default function PatientsPage() {
 
       // Refresh list
       await loadPatients();
-      alert('Patient deleted successfully');
+      alert('Patient supprimé avec succès');
     } catch (error) {
       console.error('Error deleting patient:', error);
-      alert('Error deleting patient: ' + (error.message || 'Unknown error'));
+      alert('Erreur lors de la suppression du patient: ' + (error.message || 'Erreur inconnue'));
     }
   };
 
@@ -103,14 +103,14 @@ export default function PatientsPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Patients</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage patient records and information</p>
+          <p className="text-sm text-gray-500 mt-1">Gérer les dossiers et informations des patients</p>
         </div>
         <button
           onClick={handleAddPatient}
           className="flex items-center gap-2 px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
           <Plus size={20} />
-          Add New Patient
+          Ajouter un nouveau patient
         </button>
       </div>
 
@@ -120,7 +120,7 @@ export default function PatientsPage() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search by name or patient ID..."
+            placeholder="Rechercher par nom ou identifiant du patient..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -131,19 +131,19 @@ export default function PatientsPage() {
       {/* Patients Table */}
       {isLoading ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">Loading patients...</p>
+          <p className="text-gray-500">Chargement des patients...</p>
         </div>
       ) : filteredPatients.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
           <Users className="mx-auto text-gray-400 mb-4" size={48} />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No patients found</h3>
-          <p className="text-gray-500 mb-6">{searchQuery ? 'Try adjusting your search' : 'Get started by adding a new patient'}</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun patient trouvé</h3>
+          <p className="text-gray-500 mb-6">{searchQuery ? 'Essayez d\'ajuster votre recherche' : 'Commencez par ajouter un nouveau patient'}</p>
           {!searchQuery && (
             <button
               onClick={handleAddPatient}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
-              Add Your First Patient
+              Ajouter votre premier patient
             </button>
           )}
         </div>
@@ -152,12 +152,12 @@ export default function PatientsPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Visit</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identifiant Patient</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom Complet</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Âge</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genre</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dernière visite</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -166,7 +166,7 @@ export default function PatientsPage() {
                 <tr key={patient.id} onClick={() => openPatientPanel(patient.patientId)} className="hover:bg-gray-50 transition-colors cursor-pointer">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{patient.patientId}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.fullName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calculateAge(patient.dateOfBirth)} years</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calculateAge(patient.dateOfBirth)} ans</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{patient.gender}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{patient.phoneNumber}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{patient.lastVisit || 'N/A'}</td>

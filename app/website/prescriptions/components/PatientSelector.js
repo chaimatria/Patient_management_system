@@ -3,11 +3,11 @@ export default function PatientSelector({ patients, selectedPatient, onPatientCh
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Patient Details</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Détails du patient</h3>
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Select Patient
+          Sélectionner un patient
         </label>
         <div className="relative">
           <select

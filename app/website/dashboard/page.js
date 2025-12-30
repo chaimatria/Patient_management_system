@@ -30,14 +30,14 @@ export default function DashboardPage() {
         const response = await fetch('/api/dashboard');
         
         if (!response.ok) {
-          throw new Error('Failed to fetch dashboard data');
+          throw new Error('Échec du chargement des données du tableau de bord');
         }
         
         const data = await response.json();
         setDashboardData(data);
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching dashboard data:', err);
+        console.error('Erreur lors de la récupération des données du tableau de bord:', err);
       } finally {
         setLoading(false);
       }

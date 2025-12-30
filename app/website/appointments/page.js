@@ -41,7 +41,7 @@ export default function AppointmentsPage() {
       if (!response.ok) {
         const error = await response.json();
         if (error.conflictWith) {
-          alert(`Time conflict! ${error.conflictWith.patientName} has an appointment at ${error.conflictWith.time}`);
+          alert(`Conflit d'horaire! ${error.conflictWith.patientName} a un rendez-vous à ${error.conflictWith.time}`);
         } else {
           throw new Error(error.error || 'Failed to create appointment');
         }
@@ -50,7 +50,7 @@ export default function AppointmentsPage() {
 
       await loadAppointments();
       setIsAddModalOpen(false);
-      alert('Appointment created successfully!');
+      alert('Rendez-vous créé avec succès!');
     } catch (error) {
       console.error('Error creating appointment:', error);
       alert('Error: ' + error.message);
@@ -72,7 +72,7 @@ export default function AppointmentsPage() {
 
       await loadAppointments();
       setEditingAppointment(null);
-      alert('Appointment updated successfully!');
+      alert('Rendez-vous mis à jour avec succès!');
     } catch (error) {
       console.error('Error updating appointment:', error);
       alert('Error: ' + error.message);
@@ -80,7 +80,7 @@ export default function AppointmentsPage() {
   };
 
   const handleDeleteAppointment = async (appointmentId) => {
-    if (!confirm('Are you sure you want to delete this appointment?')) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous?')) return;
 
     try {
       const response = await fetch('/api/appointments', {
@@ -92,10 +92,10 @@ export default function AppointmentsPage() {
       if (!response.ok) throw new Error('Failed to delete appointment');
 
       await loadAppointments();
-      alert('Appointment deleted successfully!');
+      alert('Rendez-vous supprimé avec succès!');
     } catch (error) {
       console.error('Error deleting appointment:', error);
-      alert('Error deleting appointment');
+      alert('Erreur lors de la suppression du rendez-vous');
     }
   };
 
@@ -149,7 +149,7 @@ export default function AppointmentsPage() {
 
   const formatDateRange = (date) => {
     if (view === 'day') {
-      return date.toLocaleDateString('en-US', { 
+      return date.toLocaleDateString('fr-FR', { 
         weekday: 'long',
         day: 'numeric',
         month: 'long', 
@@ -161,7 +161,7 @@ export default function AppointmentsPage() {
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 6);
       
-      return `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+      return `${startOfWeek.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric', year: 'numeric' })}`;
     }
   };
 
@@ -174,8 +174,8 @@ export default function AppointmentsPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Appointments Management</h1>
-          <p className="text-gray-600">Schedule and manage appointments (Independent of patient records)</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestion des rendez-vous</h1>
+          <p className="text-gray-600">Planifier et gérer les rendez-vous (Indépendant des dossiers patients)</p>
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
@@ -189,7 +189,7 @@ export default function AppointmentsPage() {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                Day View
+                Vue du jour
               </button>
               <button
                 onClick={() => setView('week')}
@@ -199,7 +199,7 @@ export default function AppointmentsPage() {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                Week View
+                Vue de la semaine
               </button>
             </div>
 
@@ -215,7 +215,7 @@ export default function AppointmentsPage() {
                 onClick={goToToday}
                 className="px-4 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg font-medium"
               >
-                Today
+                Aujourd'hui
               </button>
               
               <span className="text-sm font-medium text-gray-700 min-w-[200px] text-center">
@@ -235,7 +235,7 @@ export default function AppointmentsPage() {
               className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
             >
               <Plus size={20} />
-              New Appointment
+              Nouveau rendez-vous
             </button>
           </div>
         </div>
@@ -244,7 +244,7 @@ export default function AppointmentsPage() {
           <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-6">
             {isLoading ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">Loading appointments...</p>
+                <p className="text-gray-500">Chargement des rendez-vous...</p>
               </div>
             ) : (
               <AppointmentCalendar
@@ -259,14 +259,14 @@ export default function AppointmentsPage() {
 
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Appointments for {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              Rendez-vous du {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </h3>
             
             <div className="space-y-3 max-h-[600px] overflow-y-auto">
               {filteredAppointments.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Calendar className="mx-auto mb-2 text-gray-400" size={48} />
-                  <p>No appointments scheduled</p>
+                  <p>Aucun rendez-vous planifié</p>
                 </div>
               ) : (
                 filteredAppointments.map(apt => (
@@ -314,10 +314,10 @@ export default function AppointmentsPage() {
                       onChange={(e) => handleChangeStatus(apt.appointment_id, e.target.value)}
                       className="w-full text-xs px-2 py-1 border border-gray-300 rounded mt-2"
                     >
-                      <option value="scheduled">Scheduled</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                      <option value="no-show">No Show</option>
+                      <option value="scheduled">Planifié</option>
+                      <option value="completed">Terminé</option>
+                      <option value="cancelled">Annulé</option>
+                      <option value="no-show">Absent</option>
                     </select>
                   </div>
                 ))
@@ -392,7 +392,7 @@ function AppointmentCalendar({ currentDate, appointments, view, onSelectDate, se
           >
             <div className="text-center mb-2">
               <div className="text-xs text-gray-600 font-medium">
-                {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                  {day.toLocaleDateString('fr-FR', { weekday: 'short' })}
               </div>
               <div className={`text-lg font-bold ${today ? 'text-blue-600' : 'text-gray-900'}`}>
                 {day.getDate()}
@@ -439,7 +439,7 @@ function AppointmentModal({ appointment, onClose, onSave, selectedDate }) {
 
   const handleSubmit = () => {
     if (!formData.patientName || !formData.appointmentType) {
-      alert('Please fill in all required fields');
+      alert('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
@@ -456,23 +456,23 @@ function AppointmentModal({ appointment, onClose, onSave, selectedDate }) {
       <div className="bg-white rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <h3 className="text-xl font-semibold mb-4">
-            {appointment ? 'Edit Appointment' : 'New Appointment'}
+            {appointment ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous'}
           </h3>
 
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Patient Name *
+                Nom du patient *
               </label>
               <input
                 type="text"
                 value={formData.patientName}
                 onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
-                placeholder="Enter patient name..."
+                placeholder="Entrez le nom du patient..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Enter any name - not linked to patient database
+                Entrez n'importe quel nom - non lié à la base de données des patients
               </p>
             </div>
 
@@ -491,7 +491,7 @@ function AppointmentModal({ appointment, onClose, onSave, selectedDate }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Time *
+                Heure *
               </label>
               <input
                 type="time"
@@ -502,7 +502,7 @@ function AppointmentModal({ appointment, onClose, onSave, selectedDate }) {
               />
               {isToday && (
                 <p className="text-xs text-orange-600 mt-1">
-                  Only future times available for today
+                  Seules les heures futures sont disponibles pour aujourd'hui
                 </p>
               )}
             </div>
@@ -516,19 +516,19 @@ function AppointmentModal({ appointment, onClose, onSave, selectedDate }) {
                 onChange={(e) => setFormData({ ...formData, appointmentType: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
-                <option value="">Select type...</option>
-                <option value="Initial Consultation">Initial Consultation</option>
-                <option value="Follow-up">Follow-up</option>
-                <option value="Annual Checkup">Annual Checkup</option>
-                <option value="Treatment">Treatment</option>
-                <option value="Emergency">Emergency</option>
-                <option value="Other">Other</option>
+                <option value="">Sélectionner le type...</option>
+                <option value="Initial Consultation">Consultation initiale</option>
+                <option value="Follow-up">Suivi</option>
+                <option value="Annual Checkup">Bilan annuel</option>
+                <option value="Treatment">Traitement</option>
+                <option value="Emergency">Urgence</option>
+                <option value="Other">Autre</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Duration (minutes)
+                Durée (minutes)
               </label>
               <select
                 value={formData.duration}
@@ -543,13 +543,13 @@ function AppointmentModal({ appointment, onClose, onSave, selectedDate }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes
+                Remarques
               </label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
-                placeholder="Additional notes..."
+                placeholder="Remarques supplémentaires..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
@@ -560,14 +560,14 @@ function AppointmentModal({ appointment, onClose, onSave, selectedDate }) {
                 onClick={onClose}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
-                Cancel
+                Annuler
               </button>
               <button
                 type="button"
                 onClick={handleSubmit}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
-                {appointment ? 'Update' : 'Create'}
+                {appointment ? 'Modifier' : 'Créer'}
               </button>
             </div>
           </div>

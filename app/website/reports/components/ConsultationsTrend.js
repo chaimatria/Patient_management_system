@@ -302,11 +302,11 @@ export default function ConsultationsTrend({ data }) {
             <p className="text-xl font-bold text-gray-800">{trendData.reduce((sum, p) => sum + p.count, 0)}</p>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-600 mb-1">Average</p>
+            <p className="text-xs text-gray-600 mb-1">Moyenne</p>
             <p className="text-xl font-bold text-gray-800">{Math.round(trendData.reduce((sum, p) => sum + p.count, 0) / trendData.length)}</p>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-600 mb-1">Peak</p>
+            <p className="text-xs text-gray-600 mb-1">Pic</p>
             <p className="text-xl font-bold text-gray-800">{maxCount}</p>
           </div>
         </div>

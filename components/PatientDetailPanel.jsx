@@ -34,7 +34,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
           <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-semibold">Patient Details</h2>
+            <h2 className="text-xl font-semibold">Détails du patient</h2>
             <button
               onClick={onClose}
               className="p-1 hover:bg-white/20 rounded-lg transition-colors"
@@ -50,7 +50,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
               <span className="text-sm">•</span>
               <span className="text-sm capitalize">{patient.gender}</span>
               <span className="text-sm">•</span>
-              <span className="text-sm">{calculateAge(patient.dateOfBirth)} years</span>
+              <span className="text-sm">{calculateAge(patient.dateOfBirth)} ans</span>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
           {/* Contact Information */}
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-              Contact Information
+              Informations de contact
             </h4>
             
             {patient.phoneNumber && (
@@ -69,7 +69,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
                   <Phone size={16} className="text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Phone</p>
+                  <p className="text-xs text-gray-500">Téléphone</p>
                   <p className="text-sm font-medium">{patient.phoneNumber}</p>
                 </div>
               </div>
@@ -80,7 +80,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
                 <Calendar size={16} className="text-blue-500" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Date of Birth</p>
+                <p className="text-xs text-gray-500">Date de naissance</p>
                 <p className="text-sm font-medium">{formatDate(patient.dateOfBirth)}</p>
               </div>
             </div>
@@ -89,14 +89,14 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
           {/* Medical Information */}
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-              Medical Information
+              Informations médicales
             </h4>
             
             {patient.pathology && (
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-start gap-2 mb-2">
                   <Stethoscope size={16} className="text-gray-500 mt-0.5" />
-                  <p className="text-xs font-medium text-gray-500">Pathology</p>
+                  <p className="text-xs font-medium text-gray-500">Pathologie</p>
                 </div>
                 <p className="text-sm text-gray-700 line-clamp-3">{patient.pathology}</p>
               </div>
@@ -111,7 +111,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
             
             {patient.currentTreatment && (
               <div className="bg-green-50 rounded-lg p-4">
-                <p className="text-xs font-medium text-green-600 mb-1">Current Treatment</p>
+                <p className="text-xs font-medium text-green-600 mb-1">Traitement actuel</p>
                 <p className="text-sm text-gray-700 line-clamp-2">{patient.currentTreatment}</p>
               </div>
             )}
@@ -120,7 +120,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
           {/* Last Visit */}
           {patient.lastVisit && (
             <div className="bg-blue-50 rounded-lg p-4">
-              <p className="text-xs font-medium text-blue-600 mb-1">Last Visit</p>
+              <p className="text-xs font-medium text-blue-600 mb-1">Dernière visite</p>
               <p className="text-sm text-gray-700">{formatDate(patient.lastVisit)}</p>
             </div>
           )}
@@ -132,7 +132,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
               className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
             >
               <ExternalLink size={18} />
-              View Full Profile
+              Voir le profil complet
             </button>
           </div>
         </div>

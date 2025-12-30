@@ -137,12 +137,12 @@ export default function PrescriptionGeneratorPage() {
 
 const handleSave = async () => {
   if (!useManualEntry && !selectedPatientId) {
-    alert('Please select a patient or enter patient details manually');
+    alert('Veuillez sélectionner un patient ou entrer les détails du patient manuellement');
     return;
   }
 
   if (useManualEntry && !manualPatientName) {
-    alert('Please enter patient name');
+    alert('Veuillez entrer le nom du patient');
     return;
   }
 
@@ -151,7 +151,7 @@ const handleSave = async () => {
   );
 
   if (!hasContent) {
-    alert('Please add at least one medication');
+    alert('Veuillez ajouter au moins un médicament');
     return;
   }
 
@@ -235,7 +235,7 @@ const handleSave = async () => {
       await loadPatientPrescriptions(selectedPatientId);
     }
     
-    alert('Prescription saved successfully!');
+    alert('Ordonnance enregistrée avec succès!');
     
     // Clear the form AFTER reload
     setMedications([
@@ -248,7 +248,7 @@ const handleSave = async () => {
     }
   } catch (error) {
     console.error(' Error saving prescription:', error);
-    alert('Error saving prescription: ' + error.message);
+    alert('Erreur lors de l\'enregistrement de l\'ordonnance: ' + error.message);
   }
 };
 
@@ -265,7 +265,7 @@ const handleSave = async () => {
   };
 
   const handleDeletePrescription = async (prescriptionId) => {
-    if (!confirm('Are you sure you want to delete this prescription?')) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette ordonnance?')) return;
 
     try {
       const response = await fetch('/api/prescriptions', {
@@ -276,11 +276,11 @@ const handleSave = async () => {
 
       if (!response.ok) throw new Error('Failed to delete prescription');
 
-      alert('Prescription deleted successfully!');
+      alert('Ordonnance supprimée avec succès!');
       await loadPatientPrescriptions(selectedPatientId);
     } catch (error) {
       console.error('Error deleting prescription:', error);
-      alert('Error deleting prescription');
+      alert('Erreur lors de la suppression de l\'ordonnance');
     }
   };
 
@@ -291,7 +291,7 @@ const handleSave = async () => {
     );
 
     if (!hasContent || !patientInfo || !patientInfo.fullName) {
-      alert('Please enter patient information and add medications');
+      alert('Veuillez entrer les informations du patient et ajouter des médicaments');
       return;
     }
 
@@ -299,7 +299,7 @@ const handleSave = async () => {
   };
 
   const handleClear = () => {
-    if (confirm('Clear current form?')) {
+    if (confirm('Effacer le formulaire actuel?')) {
       setMedications([
         { id: 1, drugName: '', dosage: '', instructions: '', duration: '', quantity: '' }
       ]);
@@ -322,8 +322,8 @@ const handleSave = async () => {
       <div className="min-h-screen bg-gray-50 p-6 print:hidden">
         <div className="max-w-7xl mx-auto">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Prescription Generator</h1>
-            <p className="text-gray-600">Create and manage patient prescriptions</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Générateur d'ordonnances</h1>
+            <p className="text-gray-600">Créer et gérer les ordonnances des patients</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -331,7 +331,7 @@ const handleSave = async () => {
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <User size={20} className="text-blue-600" />
-                  Patient Information
+                  Informations du patient
                 </h3>
 
                 <div className="mb-4 flex items-center gap-4">
@@ -346,7 +346,7 @@ const handleSave = async () => {
                       }}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm font-medium">Select from Patients </span>
+                    <span className="text-sm font-medium">Sélectionner parmi les patients </span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -359,7 +359,7 @@ const handleSave = async () => {
                       }}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm font-medium">Enter manually</span>
+                    <span className="text-sm font-medium">Entrer manuellement</span>
                   </label>
                 </div>
                 
@@ -370,7 +370,7 @@ const handleSave = async () => {
                       onChange={(e) => setSelectedPatientId(e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                     >
-                      <option value="">Choose a patient...</option>
+                      <option value="">Choisir un patient...</option>
                       {patients.map(patient => (
                         <option key={patient.patientId} value={patient.patientId}>
                           {patient.fullName} - {patient.patientId}
@@ -382,21 +382,21 @@ const handleSave = async () => {
                       <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div>
-                            <span className="font-medium text-gray-700">Name:</span>
+                            <span className="font-medium text-gray-700">Nom :</span>
                             <span className="ml-2 text-gray-900">{currentPatient.fullName}</span>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">Age:</span>
+                            <span className="font-medium text-gray-700">Âge :</span>
                             <span className="ml-2 text-gray-900">
-                              {new Date().getFullYear() - new Date(currentPatient.dateOfBirth).getFullYear()} years
+                              {new Date().getFullYear() - new Date(currentPatient.dateOfBirth).getFullYear()} ans
                             </span>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">ID:</span>
+                            <span className="font-medium text-gray-700">ID :</span>
                             <span className="ml-2 text-gray-900">{currentPatient.patientId}</span>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">DOB:</span>
+                            <span className="font-medium text-gray-700">Date de naissance :</span>
                             <span className="ml-2 text-gray-900">
                               {new Date(currentPatient.dateOfBirth).toLocaleDateString()}
                             </span>
@@ -409,32 +409,32 @@ const handleSave = async () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Patient Name *
+                        Nom du patient *
                       </label>
                       <input
                         type="text"
                         value={manualPatientName}
                         onChange={(e) => setManualPatientName(e.target.value)}
-                        placeholder="Enter patient name..."
+                        placeholder="Entrer le nom du patient..."
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Patient Age *
+                        Âge du patient *
                       </label>
                       <input
                         type="text"
                         value={manualPatientAge}
                         onChange={(e) => setManualPatientAge(e.target.value)}
-                        placeholder="Enter age..."
+                        placeholder="Entrer l'âge..."
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                       />
                     </div>
                     {manualPatientName && manualPatientAge && (
                       <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
                         <p className="text-sm text-gray-700">
-                          <span className="font-medium">Patient:</span> {manualPatientName}, {manualPatientAge} years old
+                          <span className="font-medium">Patient :</span> {manualPatientName}, {manualPatientAge} ans
                         </p>
                       </div>
                     )}
@@ -445,7 +445,7 @@ const handleSave = async () => {
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Pill size={20} className="text-green-600" />
-                  Medications
+                  Médicaments
                 </h3>
 
                 <div className="space-y-4">
@@ -466,7 +466,7 @@ const handleSave = async () => {
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
                   >
                     <span className="text-xl">+</span>
-                    Add Medication
+                    Ajouter un médicament
                   </button>
                 </div>
               </div>
@@ -479,7 +479,7 @@ const handleSave = async () => {
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     <Save size={18} />
-                    Save Prescription
+                    Enregistrer l'ordonnance
                   </button>
                   <button
                     onClick={handlePrint}
@@ -487,14 +487,14 @@ const handleSave = async () => {
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     <Printer size={18} />
-                    Print
+                    Imprimer
                   </button>
                   <button
                     onClick={handleClear}
                     className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50"
                   >
                     <Trash2 size={18} />
-                    Clear
+                    Effacer
                   </button>
                 </div>
                 
@@ -506,16 +506,16 @@ const handleSave = async () => {
 
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Prescription History
+                Historique des ordonnances
               </h3>
 
               {!selectedPatientId || useManualEntry ? (
                 <p className="text-sm text-gray-500 text-center py-8">
-                  Select a patient   to view history
+                  Sélectionner un patient pour voir l'historique
                 </p>
               ) : prescriptions.length === 0 ? (
                 <p className="text-sm text-gray-500 text-center py-8">
-                  No prescriptions found for this patient
+                  Aucune ordonnance trouvée pour ce patient
                 </p>
               ) : (
                 <div className="space-y-3 max-h-[600px] overflow-y-auto">
@@ -531,21 +531,21 @@ const handleSave = async () => {
                             {new Date(prescription.prescription_date).toLocaleDateString()}
                           </p>
                           <p className="text-xs text-gray-600 mt-1">
-                            {prescription.medications?.length || 0} medication(s)
+                            {prescription.medications?.length || 0} médicament(s)
                           </p>
                         </div>
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleLoadPrescription(prescription)}
                             className="p-1 hover:bg-blue-50 rounded"
-                            title="Load"
+                            title="Charger"
                           >
                             <Download size={14} className="text-blue-600" />
                           </button>
                           <button
                             onClick={() => handleDeletePrescription(prescription.prescription_id)}
                             className="p-1 hover:bg-red-50 rounded"
-                            title="Delete"
+                            title="Supprimer"
                           >
                             <Trash2 size={14} className="text-red-600" />
                           </button>
@@ -677,7 +677,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
         <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Drug Name *
+            Nom du médicament *
           </label>
           
           <div className="relative">
@@ -692,7 +692,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
               }}
               onFocus={() => setShowMedicationDropdown(true)}
               onBlur={() => setTimeout(() => setShowMedicationDropdown(false), 200)}
-              placeholder="Type or select medication..."
+              placeholder="Taper ou sélectionner un médicament..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             
@@ -703,7 +703,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
                 {medicationsList.length > 0 && (
                   <>
                     <div className="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-600 sticky top-0">
-                      
+                      Médicaments fréquemment utilisés
                     </div>
                     {medicationsList
                       .filter(med => 
@@ -721,7 +721,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
                         >
                           <div className="font-medium text-gray-900">{med.drug_name}</div>
                           {med.usage_count > 0 && (
-                            <div className="text-xs text-blue-600">Used {med.usage_count}x</div>
+                            <div className="text-xs text-blue-600">Utilisé {med.usage_count}x</div>
                           )}
                         </div>
                       ))
@@ -731,7 +731,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
                 
                 {/* Common medications */}
                 <div className="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-600 sticky top-0">
-                   Common Medications
+                   Médicaments courants
                 </div>
                 {commonMedications
                   .filter(med => 
@@ -767,7 +767,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
               onChange={(e) => onUpdate(medication.id, 'dosage', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             >
-              <option value="">Select dosage</option>
+              <option value="">Sélectionner un dosage</option>
               {getAvailableDosages().map((dosage, idx) => (
                 <option key={idx} value={dosage}>{dosage}</option>
               ))}
@@ -798,7 +798,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
               }}
               onFocus={() => setShowInstructionDropdown(true)}
               onBlur={() => setTimeout(() => setShowInstructionDropdown(false), 200)}
-              placeholder="Type or select instruction..."
+              placeholder="Taper ou sélectionner une instruction..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             
@@ -809,7 +809,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
                 {getDatabaseInstructions().length > 0 && (
                   <>
                     <div className="px-3 py-2 bg-blue-50 text-xs font-semibold text-blue-700 sticky top-0">
-                     Saved for this medication
+                     Enregistré pour ce médicament
                     </div>
                     {getDatabaseInstructions()
                       .filter(inst => 
@@ -834,7 +834,7 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
                 
                 {/* Common instructions */}
                 <div className="px-3 py-2 bg-gray-50 text-xs font-semibold text-gray-600 sticky top-0">
-                  Common Instructions
+                  Instructions courantes
                 </div>
                 {commonInstructions
                   .filter(inst => 
@@ -859,32 +859,32 @@ function MedicationItem({ medication, index, canRemove, medicationsList, onUpdat
           </div>
           
           <p className="text-xs text-gray-500 mt-1">
-             Start typing or click to see suggestions
+             Commencez à taper ou cliquez pour voir les suggestions
           </p>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Duration
+            Durée
           </label>
           <input
             type="text"
             value={medication.duration || ''}
             onChange={(e) => onUpdate(medication.id, 'duration', e.target.value)}
-            placeholder="e.g., 7 days"
+            placeholder="ex: 7 jours"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Quantity
+            Quantité
           </label>
           <input
             type="text"
             value={medication.quantity || ''}
             onChange={(e) => onUpdate(medication.id, 'quantity', e.target.value)}
-            placeholder="e.g., 21 tablets"
+            placeholder="ex: 21 comprimés"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
           />
         </div>

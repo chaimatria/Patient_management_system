@@ -71,19 +71,19 @@ export default function ReportsPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatsCard
-          title="Total Consultations"
+          title="Consultations totales"
           value={`${reportsData.stats.totalConsultations.toLocaleString()}`}
           change="+12,5%"
           isPositive={true}
         />
         <StatsCard
-          title="Total Ordonnances"
+          title="Ordonnances totales"
           value={`${reportsData.stats.totalPrescriptions}`}
           change="+3 nouvelles"
           isPositive={true}
         />
         <StatsCard
-          title="Résolutions Réussies"
+          title="Résolutions réussies"
           value={`${reportsData.stats.successRate}%`}
           change="+0,8%"
           isPositive={true}
