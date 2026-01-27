@@ -132,7 +132,7 @@ export async function POST(request) {
     
     const prescriptionId = result.lastInsertRowid;
     
-    console.log(`✅ Created prescription with ID: ${prescriptionId} for patient: ${prescriptionData.patientId || 'manual entry'}`);
+    console.log(`Created prescription with ID: ${prescriptionId} for patient: ${prescriptionData.patientId || 'manual entry'}`);
     
     // Insert medications - FIXED TABLE NAME
     const insertMedication = db.prepare(`
@@ -158,7 +158,7 @@ export async function POST(request) {
       }
     });
     
-    console.log(`✅ Added ${medicationCount} medications to prescription ${prescriptionId}`);
+    console.log(`Added ${medicationCount} medications to prescription ${prescriptionId}`);
     
     // Get the created prescription with medications
     const createdPrescription = db.prepare(`
@@ -177,11 +177,11 @@ export async function POST(request) {
     
     createdPrescription.medications = medications;
     
-    console.log(`✅ Returning prescription with ${medications.length} medications`);
+    console.log(`Returning prescription with ${medications.length} medications`);
     
     return NextResponse.json(createdPrescription, { status: 201 });
   } catch (error) {
-    console.error('❌ POST Prescription Error:', error);
+    console.error('POST Prescription Error:', error);
     return NextResponse.json(
       { error: 'Failed to create prescription', details: error.message },
       { status: 500 }
@@ -324,7 +324,7 @@ export async function DELETE(request) {
     const deletePrescription = db.prepare('DELETE FROM prescriptions WHERE prescription_id = ?');
     deletePrescription.run(prescriptionId);
     
-    console.log(`✅ Deleted prescription ${prescriptionId}`);
+    console.log(`Deleted prescription ${prescriptionId}`);
     
     return NextResponse.json(
       { message: 'Prescription deleted successfully' },

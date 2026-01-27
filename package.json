@@ -10,7 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "electron:build": "next build && electron ."
+    "electron:build": "next build && electron .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.5",
@@ -31,8 +33,10 @@
     "electron": "^39.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
+    "jest": "^30.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
+    "vitest": "^2.1.4",
     "wait-on": "^9.0.3"
   },
   "build": {

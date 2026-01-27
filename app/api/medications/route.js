@@ -72,7 +72,7 @@ export async function POST(request) {
       'SELECT * FROM medications_library WHERE medication_lib_id = ?'
     ).get(result.lastInsertRowid);
     
-    console.log('✅ New medication added to library:', created.drug_name);
+    console.log('New medication added to library:', created.drug_name);
     
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
@@ -116,9 +116,9 @@ export async function PUT(request) {
         ) VALUES (?, 1, 'Custom')
       `).run(drugName);
       
-      console.log('✅ New medication auto-added to library:', drugName);
+      console.log('New medication auto-added to library:', drugName);
     } else {
-      console.log('✅ Usage count incremented for:', drugName);
+      console.log('Usage count incremented for:', drugName);
     }
     
     return NextResponse.json({ success: true });

@@ -196,7 +196,7 @@ export default function PasswordResetModal({ isOpen, onClose, initialStep = 'req
                       <h3 className="text-xl font-semibold text-gray-900">Lien de réinitialisation créé!</h3>
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
                         <p className="text-sm text-gray-700 mb-2 font-medium">
-                          ⚠️ Email non configuré. Utilisez ce lien:
+                           Email non configuré. Utilisez ce lien:
                         </p>
                         <div className="bg-white p-3 rounded border border-gray-200 break-all">
                           <a 
@@ -223,7 +223,7 @@ export default function PasswordResetModal({ isOpen, onClose, initialStep = 'req
                       <h3 className="text-xl font-semibold text-gray-900">Email envoyé avec succès!</h3>
                       <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-left mt-4">
                         <p className="text-sm text-gray-700 mb-2">
-                          ✅ Un email de réinitialisation a été envoyé à <strong>{email}</strong>
+                           Un email de réinitialisation a été envoyé à <strong>{email}</strong>
                         </p>
                         <p className="text-sm text-gray-600">
                           Veuillez vérifier votre boîte de réception et votre dossier spam.
@@ -234,7 +234,7 @@ export default function PasswordResetModal({ isOpen, onClose, initialStep = 'req
                       </div>
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-left mt-4">
                         <p className="text-xs text-blue-800">
-                          💡 <strong>Conseil:</strong> Si vous ne voyez pas l'email, vérifiez votre dossier spam.
+                           <strong>Conseil:</strong> Si vous ne voyez pas l'email, vérifiez votre dossier spam.
                         </p>
                       </div>
                     </>

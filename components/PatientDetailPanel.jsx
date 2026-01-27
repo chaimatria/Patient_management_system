@@ -104,7 +104,7 @@ export default function PatientDetailPanel({ patient, onClose, onViewFullProfile
             
             {patient.allergies && (
               <div className="bg-red-50 rounded-lg p-4 border border-red-100">
-                <p className="text-xs font-medium text-red-600 mb-1">⚠️ Allergies</p>
+                <p className="text-xs font-medium text-red-600 mb-1"> Allergies</p>
                 <p className="text-sm text-gray-700 line-clamp-2">{patient.allergies}</p>
               </div>
             )}
