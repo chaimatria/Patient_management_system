@@ -8,7 +8,7 @@
     "dev:next": "next dev",
     "dev:electron": "wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "eslint",
     "electron:build": "next build && electron .",
     "test": "vitest run",
