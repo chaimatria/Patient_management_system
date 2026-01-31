@@ -43,3 +43,7 @@ next-env.d.ts
 # Ignore SQLite write-ahead log and shared memory files
 data/*.sqlite-wal
 data/*.sqlite-shm
+
+# Ignore packaged Electron build artifacts
+dist/win-unpacked/
+dist/**/app.asar
